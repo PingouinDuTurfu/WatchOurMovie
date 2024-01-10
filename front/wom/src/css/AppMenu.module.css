@@ -1,0 +1,13 @@
+.navMenu {
+    position: sticky !important;
+    top: 0;
+    width: 100%;
+    overflow: auto;
+}
+
+.searchBar {
+    border-radius: 5px;
+    padding-left: 4px;
+    padding-right: 4px;
+    background-color: white;
+}
