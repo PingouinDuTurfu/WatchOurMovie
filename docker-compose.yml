@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+    front:
+        build: ./front
+        image: wom_front
+        container_name: wom_front
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./front:/app
+        command: npm start
+        depends_on:
+            - api
+    api:
+        build: ./api
+        image: wom_api
+        container_name: wom_api
+        ports:
+            - "3001:3001"
+        volumes:
+            - ./api:/app
+        command: npm start
+        depends_on:
+            - db
+    db:
+        build: ./db
+        image: wom_db
+        container_name: wom_db
+        ports:
+            - "3306:3306"
+        volumes:
+            - ./db:/data/db
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
