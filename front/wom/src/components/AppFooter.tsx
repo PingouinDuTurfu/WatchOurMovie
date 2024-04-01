@@ -1,6 +1,6 @@
 import { Assignment, Home, Movie, People, Person } from '@mui/icons-material';
 import { BottomNavigation, BottomNavigationAction } from '@mui/material'
-import React, { useState } from 'react'
+import React from 'react'
 import styles from "../css/AppFooter.module.css";
 import { Link } from 'react-router-dom';
 
