@@ -7,6 +7,7 @@ import AppFilms from "./AppFilms";
 import AppGroupes from "./AppGroupes";
 import AppCGU from "./AppCGU";
 import AppRecommandations from "./AppRecommandations";
+import AppError404 from './AppError404';
 
 const AppRouter = () => {
   return (
@@ -19,6 +20,7 @@ const AppRouter = () => {
       <Route path="/inscription" element={<AppInscription />} />
       <Route path="/cgu" element={<AppCGU />} />
       <Route path="/recommandations" element={<AppRecommandations />} />
+      <Route path="*" element={<AppError404 />} />
     </Routes>
   );
 };
