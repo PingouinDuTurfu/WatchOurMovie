@@ -3,6 +3,7 @@
     top: 0;
     width: 100%;
     overflow: auto;
+    background-color: rgb(65, 150, 190) !important;
 }
 
 .searchBar {
