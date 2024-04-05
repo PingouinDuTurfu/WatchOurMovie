@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.paperInscription {
+  display: flex;
+  padding: 0em 3em 0em 3em;
+  justify-content: center;
+
+  Button,
+  .inputText,
+  .languageSelect {
+    margin: 0.5em;
+  }
+}
+
+.inscriptionContainer {
+  padding: 2em;
+  text-align: center;
+}

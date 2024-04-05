@@ -6,12 +6,9 @@
 }
 
 .paperConnexion {
-    padding: 2em 4em 2em 4em;
+    padding: 0em 3em 0em 3em;
 
-    Button {
-        margin: 1em;
-    }
-
+    Button,
     .inputText {
         margin: 0.5em;
     }
@@ -19,6 +16,6 @@
 
 .connexionContainer,
 .inscriptionContainer {
-  padding: 2em;
+  padding: 1em 2em 2em 2em;
   text-align: center;
 }
