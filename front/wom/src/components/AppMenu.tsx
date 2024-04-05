@@ -45,9 +45,6 @@ export default function AppMenu({ setFooterNavValue }: AppMenuProps) {
         <Button color="inherit" component={Link} to="/connexion" onClick={() => handleNavClick(undefined)}>
           Connexion
         </Button>
-        <Button color="inherit" component={Link} to="/inscription" onClick={() => handleNavClick(undefined)}>
-          Inscription
-        </Button>
       </Toolbar>
     </AppBar>
   )
