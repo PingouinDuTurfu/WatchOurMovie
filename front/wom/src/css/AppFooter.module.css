@@ -4,3 +4,7 @@
     width: 100%;
     overflow: auto;
 }
+
+.activeIcon {
+    color: rgb(65, 150, 190) !important;
+}
