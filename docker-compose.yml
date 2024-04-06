@@ -1,5 +1,14 @@
 version: '3.8'
 services:
+    db_manager:
+        build:
+            context: .
+            dockerfile: ./db/Dockerfile
+        container_name: wom_db_manager
+        ports:
+            - "3001:3001"
+        env_file:
+            - .env
     auth_provider:
         build:
             context: .

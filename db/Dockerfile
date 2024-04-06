@@ -1,5 +1,11 @@
-FROM mariadb
+FROM node:latest
 
-COPY ./dbinit.sql /docker-entrypoint-initdb.d/
+CMD ["mkdir", "/app"]
+WORKDIR /app
 
-EXPOSE 3306
+COPY db/package.json ./
+RUN npm install
+
+COPY /db/ .
+
+CMD ["node", "app.js"]
