@@ -3,3 +3,6 @@
 
 /db/package-lock.json
 /db/node_modules
+
+/auth/package-lock.json
+/auth/node_modules
