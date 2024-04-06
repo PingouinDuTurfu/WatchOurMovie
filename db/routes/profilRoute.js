@@ -18,9 +18,9 @@ router.get('/', async (req, res) => {
 
 router.post('/firstConnection', async (req, res) => {
     try {
-        const { clientId, name, lastname, age, language } = req.body;
+        const { userId, name, lastname, age, language } = req.body;
 
-        const profils = await Profils.findOne({ clientId: clientId });
+        const profils = await Profils.findOne({ userId: userId });
 
         if(profils)
             res.status(409).json({ error: 'Profil already exists' });
@@ -39,7 +39,7 @@ router.post('/firstConnection', async (req, res) => {
         });
 
         const profil = new Profils({
-            clientId: clientId,
+            userId: userId,
             name: name,
             lastname: lastname,
             age: age,
@@ -59,9 +59,9 @@ router.post('/firstConnection', async (req, res) => {
 
 router.post('/addSeenMovie', async (req, res) => {
     try {
-        const { clientId, movieId } = req.body;
+        const { userId, movieId } = req.body;
 
-        const profils = await Profils.findOneAndUpdate({ clientId: clientId }, { $addToSet: { moviesSeen: movieId } }, { new: true });
+        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $addToSet: { moviesSeen: movieId } }, { new: true });
 
         if(profils) {
             res.status(200).json(profils);

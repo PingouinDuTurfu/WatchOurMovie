@@ -1,7 +1,7 @@
 const database = require('../database/database');
 
 const profilSchema = new database.Schema({
-    clientId: { type: String, required: true },
+    userId: { type: String, required: true },
     name: { type: String, required: true },
     lastname: { type: String, required: true },
     age: { type: Number, required: true },
