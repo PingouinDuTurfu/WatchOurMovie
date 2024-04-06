@@ -28,6 +28,7 @@ export default function AppInscription() {
               S'inscrire
             </Button>
           </FormControl>
+          <h2>Genre</h2>
         </div>
       </Paper>
     </div>
