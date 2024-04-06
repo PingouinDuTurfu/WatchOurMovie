@@ -25,12 +25,12 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { username, hashPassword } = req.body;
         const user = await User.findOne({ username });
         if (!user) {
             return res.status(401).json({ error: 'Authentication failed' });
         }
-        const passwordMatch = await bcrypt.compare(password, user.password);
+        const passwordMatch = await bcrypt.compare(hashPassword, user.password);
         if (!passwordMatch) {
             return res.status(401).json({ error: 'Authentication failed' });
         }
