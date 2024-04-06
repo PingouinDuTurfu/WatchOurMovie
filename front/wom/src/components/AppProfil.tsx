@@ -6,9 +6,9 @@ import styles from "../css/AppProfil.module.css";
 export default function AppProfil() {
   // Exemple utilisateur
   const user = {
-    name: 'Nom',
+    name: 'Prénom',
     surname: 'Exemple',
-    email: 'nom@example.com',
+    email: 'nom@exemple.com',
     pseudo: 'SuperExemple',
     groups: ['Group 1', 'Group 2', 'Group 3'],
     genres: ['Romance', 'Comedy']
@@ -35,7 +35,7 @@ export default function AppProfil() {
   return (
     <div className={styles.container}>
       <div className={styles.profil}>
-        <Avatar alt="User Avatar" src="dune2.jpg" className={styles.avatar} />
+        <Avatar alt="User Avatar" className={styles.avatar} />
         <div className={styles.userInfo}>
           <div className={styles.nameContainer}>
             <Typography variant="h4">{user.pseudo}</Typography>

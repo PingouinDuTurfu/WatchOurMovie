@@ -6,11 +6,11 @@
 }
 
 .avatar {
-  width: 350px !important;
-  height: 350px !important;
+  width: 250px !important;
+  height: 250px !important;
   border-radius: 50%;
 }
-
+  
 .profil {
   display: flex;
 }
