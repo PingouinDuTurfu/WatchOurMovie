@@ -2,6 +2,7 @@ const express = require('express');
 const {initialize} = require('./database/initialize');
 
 const profilRoutes = require('./routes/profilRoute');
+const languageRoutes = require('./routes/languageRoute');
 const genreRoutes = require('./routes/genreRoute');
 const groupRoutes = require('./routes/groupRoute');
 const movieRoutes = require('./routes/movieRoute');
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
 app.use(express.json());
 
 app.use('/profil', profilRoutes,);
+app.use('/language', languageRoutes);
 app.use('/genre', genreRoutes);
 app.use('/group', groupRoutes);
 app.use('/movie', movieRoutes);
