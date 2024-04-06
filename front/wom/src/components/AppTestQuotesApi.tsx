@@ -6,7 +6,7 @@ interface QuoteResponse {
   author: string;
 }
 
-const AppRandomQuote = () => {
+export default function AppRandomQuote() {
   const [quote, setQuote] = useState<string | null>(null);
   const [author, setAuthor] = useState<string | null>(null);
 
@@ -33,6 +33,4 @@ const AppRandomQuote = () => {
       )}
     </div>
   );
-};
-
-export default AppRandomQuote;
+}

@@ -7,7 +7,7 @@ interface LyricsResponse {
   song: string;
 }
 
-const AppTestApi = () => {
+export default function AppTestApi() {
   const [lyrics, setLyrics] = useState<string | null>(null);
   const [album, setAlbum] = useState<string | null>(null);
   const [song, setSong] = useState<string | null>(null);
@@ -37,6 +37,4 @@ const AppTestApi = () => {
       )}
     </div>
   );
-};
-
-export default AppTestApi;
+}

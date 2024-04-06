@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import AppTestLyricsApi from './AppTestLyricsApi';
 import MovieQuoteApi from './AppTestQuotesApi';
 
-const AppHome = () => {
+export default function AppHome() {
   return (
     <div>
       <Button variant='contained' component={Link} to="/recommandations">Recommandations</Button>
@@ -12,6 +12,4 @@ const AppHome = () => {
       <MovieQuoteApi />
     </div>
   );
-};
-
-export default AppHome;
+}

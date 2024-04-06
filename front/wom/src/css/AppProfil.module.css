@@ -1,0 +1,33 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.avatar {
+  width: 350px !important;
+  height: 350px !important;
+  border-radius: 50%;
+}
+
+.profil {
+  display: flex;
+}
+
+.userInfo {
+  margin: 4em;
+}
+
+.nameContainer {
+  display: flex;
+  align-items: center;
+}
+
+.editButton {
+  margin-left: 2em;
+}
+
+.watchedButton {
+  margin-top: 1em;
+}
