@@ -13,7 +13,7 @@ services:
         build:
             context: .
             dockerfile: ./auth/Dockerfile
-        container_name: auth_provider
+        container_name: wom_auth_provider
         ports:
             - "3000:3000"
         env_file:

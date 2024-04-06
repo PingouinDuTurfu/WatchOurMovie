@@ -5,7 +5,7 @@ const PORT = process.env.MONGO_PORT || '27017';
 
 const USER = process.env.MONGO_USER || '';
 const PASSWORD = process.env.MONGO_PASSWORD || '';
-const DB = process.env.MONGO_AUTH_DB || 'default';
+const DB = process.env.MONGO_DATABASE || 'default';
 
 if (!USER || !PASSWORD) {
     console.error('MongoDB environment variables not set');
