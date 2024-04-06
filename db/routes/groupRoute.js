@@ -4,7 +4,7 @@ const Profils = require('../models/profil');
 
 router.get('/', async (req, res) => {
     try {
-        const groupId = req.query.id;
+        const groupId = req.query.groupId;
         const profils = await Profils.find({ 'groups.groupId': groupId });
         if(profils)
             res.status(200).json(profils);
@@ -18,12 +18,13 @@ router.get('/', async (req, res) => {
 
 router.post('/create', async (req, res) => {
     try {
-        const { clientId, groupName } = req.body;
+        const userId = req.params.userId;
+        const groupName = req.body.groupName;
         const group = {
             groupId: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
             groupName: groupName
         }
-        await Profils.findOneAndUpdate({ clientId: clientId }, { $push: { groups: group } });
+        await Profils.findOneAndUpdate({ userId: userId }, { $push: { groups: group } });
         res.status(200).json(group);
     } catch (error) {
         console.log(error);
@@ -33,9 +34,9 @@ router.post('/create', async (req, res) => {
 
 router.post('/leave', async (req, res) => {
     try {
-        const clientId = req.params.clientId;
+        const userId = req.params.userId;
         const groupId = req.body.groupId;
-        const profil = await Profils.findOneAndUpdate({ clientId: clientId }, { $pull: { groups: { groupId: groupId } } });
+        const profil = await Profils.findOneAndUpdate({ userId: userId }, { $pull: { groups: { groupId: groupId } } });
         res.status(200).json(profil);
     } catch (error) {
         console.log(error);
@@ -45,9 +46,9 @@ router.post('/leave', async (req, res) => {
 
 router.post('/join', async (req, res) => {
     try {
-        const clientId = req.params.clientId;
+        const userId = req.params.userId;
         const { groupId, groupName } = req.body;
-        const profil = await Profils.findOneAndUpdate({ clientId: clientId }, { $push: { groups: { groupId: groupId, groupName: groupName } } });
+        const profil = await Profils.findOneAndUpdate({ userId: userId }, { $push: { groups: { groupId: groupId, groupName: groupName } } });
         res.status(200).json(profil);
     } catch (error) {
         console.log(error);
