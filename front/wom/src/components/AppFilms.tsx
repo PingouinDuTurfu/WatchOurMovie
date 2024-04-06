@@ -80,9 +80,9 @@ export default function AppFilms() {
   }
 
   return (
-    <div>
+    <div className={styles.container}>
       <h1>Films</h1>
-      <div className={styles.container}>
+      <div className={styles.filmsContainer}>
         {filmsToShow.map((film) => (
           <Link to={`/films/${film.id}`} key={film.id} className={styles.filmContainer}>
             <img 
