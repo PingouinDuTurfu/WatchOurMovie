@@ -8,7 +8,7 @@ const movieRoutes = require('./routes/movieRoute');
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.DB_MANAGER_PORT || 3000;
 
 initialize();
 
