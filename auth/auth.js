@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const User = require('./models/user');
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || '';
@@ -14,6 +13,13 @@ if(!JWT_SECRET) {
 router.post('/register', async (req, res) => {
     try {
         const { username, hashPassword } = req.body;
+
+        const alreadyUser = await User.findOne({ username: username });
+
+        if(alreadyUser)
+            res.status(409).json({ error: 'User already exists' });
+
+
         const user = new User({ username, password: hashPassword });
         await user.save();
         res.status(201).json({ message: 'User registered successfully' });
