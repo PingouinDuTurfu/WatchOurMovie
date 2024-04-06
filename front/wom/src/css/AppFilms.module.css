@@ -1,4 +1,8 @@
 .container {
+    padding-bottom: 5em;
+}
+
+.filmsContainer {
     display: flex;
     flex-wrap: wrap;
 }
