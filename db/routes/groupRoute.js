@@ -20,12 +20,14 @@ router.post('/create', async (req, res) => {
     try {
         const userId = req.params.userId;
         const groupName = req.body.groupName;
-        const group = {
-            groupId: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
-            groupName: groupName
-        }
-        await Profils.findOneAndUpdate({ userId: userId }, { $push: { groups: group } });
-        res.status(200).json(group);
+
+        const arlreadyExist = await Profils.findOne({ 'groups.groupName': groupName });
+
+        if(arlreadyExist)
+            return res.status(409).json({ error: 'Group already exists' });
+
+        await Profils.findOneAndUpdate({ userId: userId }, { $push: { groups: { groupName: groupName } } });
+        res.status(200).json({ groupName: groupName });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'An error occurred' });
