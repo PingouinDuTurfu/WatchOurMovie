@@ -4,8 +4,8 @@ const Profils = require('../models/profil');
 
 router.get('/', async (req, res) => {
     try {
-        const groupId = req.query.groupId;
-        const profils = await Profils.find({ 'groups.groupId': groupId });
+        const groupName = req.query.groupName;
+        const profils = await Profils.find({ 'groups.groupName': groupName });
         if(profils)
             res.status(200).json(profils);
         else
