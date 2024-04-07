@@ -18,3 +18,12 @@ services:
             - "3000:3000"
         env_file:
             - .env
+    log:
+        build:
+            context: .
+            dockerfile: ./log/Dockerfile
+        container_name: wom_log
+        ports:
+            - "3002:3002"
+        env_file:
+            - .env
