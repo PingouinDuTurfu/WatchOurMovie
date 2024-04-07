@@ -1,5 +1,3 @@
-
-
 const database = require('../database/database');
 
 const languageSchema = new database.Schema({

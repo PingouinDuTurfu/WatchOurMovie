@@ -1,7 +1,7 @@
 const express = require('express');
 
 const app = express();
-const authRoutes = require('./auth');
+const authRoutes = require('./routes/authRoute');
 
 const PORT = process.env.AUTH_PORT || 3000;
 
