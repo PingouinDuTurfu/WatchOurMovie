@@ -6,3 +6,6 @@
 
 /auth/package-lock.json
 /auth/node_modules
+
+/log/package-lock.json
+/log/node_modules
