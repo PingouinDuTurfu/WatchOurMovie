@@ -3,9 +3,9 @@ FROM node:latest
 CMD ["mkdir", "/app"]
 WORKDIR /app
 
-COPY db/package.json ./
+COPY auth/package.json ./
 RUN npm install
 
-COPY /db/ .
+COPY /auth/ .
 
 CMD ["node", "app.js"]

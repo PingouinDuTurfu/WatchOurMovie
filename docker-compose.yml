@@ -1,36 +1,20 @@
-version: '3'
-
+version: '3.8'
 services:
-    front:
-        build: ./front
-        image: wom_front
-        container_name: wom_front
-        ports:
-            - "3000:3000"
-        volumes:
-            - ./front:/app
-        command: npm start
-        depends_on:
-            - api
-    api:
-        build: ./api
-        image: wom_api
-        container_name: wom_api
+    db_manager:
+        build:
+            context: .
+            dockerfile: ./db/Dockerfile
+        container_name: wom_db_manager
         ports:
             - "3001:3001"
-        volumes:
-            - ./api:/app
-        command: npm start
-        depends_on:
-            - db
-    db:
-        build: ./db
-        image: wom_db
-        container_name: wom_db
+        env_file:
+            - .env
+    auth_provider:
+        build:
+            context: .
+            dockerfile: ./auth/Dockerfile
+        container_name: wom_auth_provider
         ports:
-            - "3306:3306"
-        volumes:
-            - ./db:/data/db
-        environment:
-            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            - "3000:3000"
+        env_file:
+            - .env
