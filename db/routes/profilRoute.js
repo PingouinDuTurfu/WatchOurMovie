@@ -4,8 +4,8 @@ const Profils = require('../models/profil');
 
 router.get('/', async (req, res) => {
     try {
-        const id = req.query.id;
-        const profils = await Profils.findOne({ id: id });
+        const userId = req.query.userId;
+        const profils = await Profils.findOne({ userId: userId });
         if(profils)
             res.status(200).json(profils);
         else
@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 
 router.post('/firstConnection', async (req, res) => {
     try {
-        const { userId, name, lastname, age, language } = req.body;
+        const { userId, username, name, lastname, age, language } = req.body;
 
         const profils = await Profils.findOne({ userId: userId });
 
@@ -28,10 +28,7 @@ router.post('/firstConnection', async (req, res) => {
         const preferenceGenres = [];
         const groups = [];
 
-        req.body.groups.forEach(group => {
-            if(group.groupId && group.groupName)
-                groups.push({ groupId: group.groupId, groupName: group.groupName });
-        });
+
 
         req.body.preferenceGenres.forEach(genre => {
             if(genre)
@@ -40,6 +37,7 @@ router.post('/firstConnection', async (req, res) => {
 
         const profil = new Profils({
             userId: userId,
+            username: username,
             name: name,
             lastname: lastname,
             age: age,
@@ -68,6 +66,16 @@ router.post('/addSeenMovie', async (req, res) => {
         } else {
             res.status(404).json({ error: 'Profil not found' });
         }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'An error occurred' });
+    }
+});
+
+router.get('/list', async (req, res) => {
+    try {
+        const profils = await Profils.find();
+        res.status(200).json(profils);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'An error occurred' });

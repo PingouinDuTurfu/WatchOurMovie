@@ -9,7 +9,7 @@ const movieRoutes = require('./routes/movieRoute');
 
 const app = express();
 
-const PORT = process.env.DB_MANAGER_PORT || 3000;
+const PORT = process.env.DB_MANAGER_PORT || 3001;
 
 initialize();
 
@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
 
 app.use(express.json());
 
-app.use('/profil', profilRoutes,);
+app.use('/profil', profilRoutes);
 app.use('/language', languageRoutes);
 app.use('/genre', genreRoutes);
 app.use('/group', groupRoutes);
