@@ -16,6 +16,20 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get('/fromUsername', async (req, res) => {
+    try {
+        const username = req.query.username;
+        const profils = await Profils.findOne({ username: username });
+        if(profils)
+            res.status(200).json(profils);
+        else
+            res.status(404).json({ error: 'Profil not found' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'An error occurred' });
+    }
+});
+
 router.post('/firstConnection', async (req, res) => {
     try {
         const { userId, username, name, lastname, age, language } = req.body;
