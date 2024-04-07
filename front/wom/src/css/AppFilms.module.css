@@ -58,3 +58,13 @@
     display: inline-block;
     cursor: pointer;
 }
+
+.searchInput {
+    background-color: rgb(200, 220, 240);
+    padding: 4px 10px 4px 10px;
+    border-radius: 5px;
+}
+
+.searchInput:active {
+    background-color: rgb(200, 210, 230);
+}
