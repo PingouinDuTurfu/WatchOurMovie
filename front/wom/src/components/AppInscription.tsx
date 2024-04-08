@@ -1,7 +1,15 @@
 import { Button, FormControl, InputLabel, MenuItem, Paper, Select, TextField } from '@mui/material'
 import styles from "../css/AppInscription.module.css";
+import ApiUtils from '../utils/ApiUtils';
+import { Navigate } from 'react-router-dom';
 
 export default function AppInscription() {
+  const auth = ApiUtils.getAuthToken();
+
+  if (auth) {
+    return <Navigate to="/profil" />;
+  }
+
   return (
     <div className={styles.container}>
       <Paper elevation={3} className={styles.paperInscription}>

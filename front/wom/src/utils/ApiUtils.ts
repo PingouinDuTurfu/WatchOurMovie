@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import { hashPassword } from "./HashUtils";
 
 export default abstract class ApiUtils {
   private static AUTH_TOKEN: string | null = null;
@@ -6,7 +7,7 @@ export default abstract class ApiUtils {
   private static readonly API_INSTANCE_JSON = axios.create({
     baseURL: ApiUtils.API_BASE_URL,
     headers: {
-      "Content-Type": "multipart/json",
+      "Content-Type": "application/json",
     },
   });
   private static readonly API_INSTANCE_FORM_DATA = axios.create({
@@ -29,10 +30,13 @@ export default abstract class ApiUtils {
     password: string
   ): Promise<string | null> {
     try {
+      const hashedPassword = hashPassword(password);
+  
       const response = await ApiUtils.API_INSTANCE_JSON.post("/login", {
         username,
-        password,
+        hashedPassword,
       });
+      
       const token = response.data.token;
       ApiUtils.AUTH_TOKEN = token;
       return token;

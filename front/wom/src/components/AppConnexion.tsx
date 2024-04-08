@@ -1,16 +1,36 @@
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from "react-router-dom";
 import styles from "../css/AppConnexion.module.css";
-import { Button, FormControl, Paper, TextField } from '@mui/material';
+import { Button, FormControl, Paper, TextField } from "@mui/material";
+import ApiUtils from "../utils/ApiUtils";
 
 export default function AppConnexion() {
+  const auth = ApiUtils.getAuthToken();
+
+  if (auth) {
+    return <Navigate to="/profil" />;
+  }
+
   return (
     <div className={styles.container}>
       <Paper elevation={3} className={styles.paperConnexion}>
         <div className={styles.connexionContainer}>
           <h2>Connexion</h2>
           <FormControl>
-            <TextField className={styles.inputText} id="pseudo" label="Pseudo" variant="outlined" fullWidth />
-            <TextField className={styles.inputText} id="password" label="Mot de passe" type="password" variant="outlined" fullWidth />
+            <TextField
+              className={styles.inputText}
+              id="pseudo"
+              label="Pseudo"
+              variant="outlined"
+              fullWidth
+            />
+            <TextField
+              className={styles.inputText}
+              id="password"
+              label="Mot de passe"
+              type="password"
+              variant="outlined"
+              fullWidth
+            />
             <Button variant="contained" color="primary" fullWidth>
               Se connecter
             </Button>
@@ -19,7 +39,12 @@ export default function AppConnexion() {
         <div className={styles.inscriptionContainer}>
           <h2>Pas encore inscrit ?</h2>
           <p>Inscrivez-vous dès maintenant !</p>
-          <Button component={Link} to="/inscription" variant="outlined" fullWidth>
+          <Button
+            component={Link}
+            to="/inscription"
+            variant="outlined"
+            fullWidth
+          >
             Inscription
           </Button>
         </div>
