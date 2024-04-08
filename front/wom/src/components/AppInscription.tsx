@@ -1,4 +1,4 @@
-import { Button, FormControl, InputLabel, MenuItem, Paper, Select, TextField } from '@mui/material'
+import { Button, FormControl, MenuItem, Paper, TextField } from '@mui/material'
 import styles from "../css/AppInscription.module.css";
 import ApiUtils from '../utils/ApiUtils';
 import { Navigate } from 'react-router-dom';
