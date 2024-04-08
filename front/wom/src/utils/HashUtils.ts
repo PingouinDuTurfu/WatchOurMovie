@@ -1,5 +1,5 @@
-import { SHA512 } from "crypto-js";
+import { sha512 } from "js-sha512";
 
 export function hashPassword(password: string) {
-  return SHA512(password).toString();
+  return sha512(password).toString();
 }
