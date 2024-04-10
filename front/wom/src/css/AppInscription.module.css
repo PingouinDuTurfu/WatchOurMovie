@@ -12,7 +12,7 @@
 
   Button,
   .inputText,
-  .languageSelect {
+  .languageSelect, .genreSelect {
     margin: 0.5em;
   }
 }
@@ -20,4 +20,13 @@
 .inscriptionContainer {
   padding: 2em;
   text-align: center;
+}
+
+.selectedGenres {
+  width: 40vw;
+}
+
+.deleteIcon {
+  margin-left: 0.25em;
+  vertical-align: center;
 }

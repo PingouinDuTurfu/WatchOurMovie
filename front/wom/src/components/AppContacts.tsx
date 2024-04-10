@@ -1,5 +1,4 @@
-import React from "react";
-import { Email, Phone, LocationOn, GitHub } from "@mui/icons-material";
+import { Email, LocationOn, GitHub } from "@mui/icons-material";
 import styles from "../css/AppContacts.module.css";
 import { Typography } from "@mui/material";
 
