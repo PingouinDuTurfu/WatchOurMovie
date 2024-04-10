@@ -11,6 +11,7 @@ import AppError404 from './AppError404';
 import AppContacts from "./AppContacts";
 import AppFilmDetails from "./AppFilmDetails";
 import AppRoutesPrivate from "./AppRoutesPrivate";
+import AppGroupeDetails from "./AppGroupeDetails";
 
 const AppRouter = () => {
   return (
@@ -23,11 +24,12 @@ const AppRouter = () => {
       <Route path="/contacts" element={<AppContacts />} />
       <Route path="/films/:filmId" element={<AppFilmDetails />} />
       <Route path="*" element={<AppError404 />} />
-      <Route element={<AppRoutesPrivate />}>
+      {/* <Route element={<AppRoutesPrivate />}> */}
         <Route path="/groupes" element={<AppGroupes />} />
+        <Route path="/groupes/:groupeId" element={<AppGroupeDetails />} />
         <Route path="/profil" element={<AppProfil />} />
         <Route path="/recommandations" element={<AppRecommandations />} />
-      </Route>
+      {/* </Route> */}
     </Routes>
   );
 };
