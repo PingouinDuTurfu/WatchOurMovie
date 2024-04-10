@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('./models/user');
+const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || '';
@@ -21,7 +21,6 @@ router.post('/register', async (req, res) => {
             return;
         }
 
-
         const user = new User({ username, password: hashPassword });
         await user.save();
         res.status(201).json({ message: 'User registered successfully' });
@@ -34,8 +33,6 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { username, hashPassword } = req.body;
-
-        console.log(username, hashPassword);
 
         const user = await User.findOne({ username });
         if (!user)
