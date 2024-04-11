@@ -37,7 +37,7 @@ export default function AppInscription() {
           <h2>Inscription</h2>
           <FormControl>
             <TextField className={styles.inputText} id="name" label="Prénom" variant="outlined" fullWidth />
-            <TextField className={styles.inputText} id="surname" label="Nom" variant="outlined" fullWidth />
+            <TextField className={styles.inputText} id="lastname" label="Nom" variant="outlined" fullWidth />
             <TextField className={styles.inputText} id="email" label="Email" variant="outlined" fullWidth />
             <TextField className={styles.inputText} id="pseudo" label="Pseudo" variant="outlined" fullWidth />
             <TextField className={styles.inputText} id="password" label="Mot de passe" type="password" variant="outlined" fullWidth />

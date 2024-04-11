@@ -1,5 +1,5 @@
 .container {
-    padding-bottom: 5em;
+    padding-bottom: 3em;
 }
 
 .filmsContainer {
@@ -54,7 +54,7 @@
     border: none;
     border-radius: 4px;
     background-color: rgb(78, 76, 166);
-    color: #fff;
+    color: rgb(255, 255, 255);
     display: inline-block;
     cursor: pointer;
 }

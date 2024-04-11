@@ -1,5 +1,10 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance, AxiosError } from "axios";
 import { hashPassword } from "./HashUtils";
+
+interface LoginRequestBody {
+  username: string;
+  hashPassword: string;
+}
 
 export default abstract class ApiUtils {
   private static AUTH_TOKEN: string | null = null;
@@ -31,38 +36,37 @@ export default abstract class ApiUtils {
   ): Promise<string | null> {
     try {
       const hashedPassword = hashPassword(password);
-  
-      const response = await ApiUtils.API_INSTANCE_JSON.post("/login", {
-        username,
-        hashedPassword,
-      });
-      
+
+      const requestBody: LoginRequestBody = {
+        username: username,
+        hashPassword: hashedPassword,
+      };
+
+      const response = await ApiUtils.API_INSTANCE_JSON.post("/login", requestBody);
+
       const token = response.data.token;
       ApiUtils.AUTH_TOKEN = token;
       return token;
     } catch (error) {
-      console.error("Error logging in:", error);
+      if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError;
+        if (axiosError.response?.status === 401) {
+          throw new Error("Identifiant ou mot de passe incorrect.");
+        }
+      }
       return null;
     }
   }
 
-  static async logout(): Promise<void> {
-    return ApiUtils.API_INSTANCE_JSON.post("/logout", {
-      token: ApiUtils.AUTH_TOKEN,
-    })
-      .then(() => {
-        ApiUtils.AUTH_TOKEN = null;
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la déconnexion :", error);
-      });
+  static logout() {
+    ApiUtils.setAuthToken(null);
   }
 
   static getAuthToken(): string | null {
     return ApiUtils.AUTH_TOKEN;
   }
 
-  static setAuthToken(token: string): void {
+  static setAuthToken(token: string | null): void {
     ApiUtils.AUTH_TOKEN = token;
   }
 }

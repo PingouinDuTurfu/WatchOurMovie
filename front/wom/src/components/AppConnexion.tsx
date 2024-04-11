@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import styles from "../css/AppConnexion.module.css";
 import { Button, FormControl, Paper, TextField } from "@mui/material";
@@ -5,6 +6,38 @@ import ApiUtils from "../utils/ApiUtils";
 
 export default function AppConnexion() {
   const auth = ApiUtils.getAuthToken();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleLogin = async () => {
+    try {
+      const token = await ApiUtils.login(username, password);
+      if (token) {
+        return <Navigate to="/profil" />;
+      } else {
+        setError("Connexion échouée, veuillez réessayer");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la connexion :", error);
+      setError("Identifiant ou mot de passe incorrect.");
+    }
+  };
+
+  function handleUsernameChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const { value } = event.target;
+    setUsername(value);
+    setIsFormValid(value !== "" && !!password);
+    setError(null);
+  }
+
+  function handlePasswordChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const { value } = event.target;
+    setPassword(value);
+    setIsFormValid(value !== "" && !!username);
+    setError(null);
+  }
 
   if (auth) {
     return <Navigate to="/profil" />;
@@ -22,6 +55,8 @@ export default function AppConnexion() {
               label="Pseudo"
               variant="outlined"
               fullWidth
+              value={username}
+              onChange={handleUsernameChange}
             />
             <TextField
               className={styles.inputText}
@@ -30,10 +65,13 @@ export default function AppConnexion() {
               type="password"
               variant="outlined"
               fullWidth
+              value={password}
+              onChange={handlePasswordChange}
             />
-            <Button variant="contained" color="primary" fullWidth>
+            <Button variant="contained" color="primary" fullWidth onClick={handleLogin} disabled={!isFormValid}>
               Se connecter
             </Button>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
           </FormControl>
         </div>
         <div className={styles.inscriptionContainer}>

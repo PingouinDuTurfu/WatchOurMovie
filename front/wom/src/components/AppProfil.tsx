@@ -7,7 +7,7 @@ export default function AppProfil() {
   // Exemple utilisateur
   const user = {
     name: 'Prénom',
-    surname: 'Exemple',
+    lastname: 'Exemple',
     email: 'nom@exemple.com',
     pseudo: 'SuperExemple',
     groups: ['Group 1', 'Group 2', 'Group 3'],
@@ -44,7 +44,7 @@ export default function AppProfil() {
             </Button>
           </div>
           <Typography variant="body1">Prénom : {user.name}</Typography>
-          <Typography variant="body1">Nom : {user.surname}</Typography>
+          <Typography variant="body1">Nom : {user.lastname}</Typography>
           <Typography variant="body1">Email : {user.email}</Typography>
         </div>
       </div>

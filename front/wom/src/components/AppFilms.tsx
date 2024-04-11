@@ -1,83 +1,52 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "../css/AppFilms.module.css";
 import { Link } from "react-router-dom";
 import { IconButton, InputBase } from "@mui/material";
 import { Search } from "@mui/icons-material";
+import ApiUtils from "../utils/ApiUtils";
 
-const filmsData = [
-  {
-    id: 1,
-    title: "Dune 2",
-    imageUrl: "dune2.jpg",
-  },
-  {
-    id: 2,
-    title: "Dune 2",
-    imageUrl: "dune2.jpg",
-  },
-  {
-    id: 3,
-    title: "Dune 2",
-    imageUrl: "dune2.jpg",
-  },
-  {
-    id: 4,
-    title: "Dune 2",
-    imageUrl: "dune2.jpg",
-  },
-  {
-    id: 5,
-    title: "Dune 2",
-    imageUrl: "dune2.jpg",
-  },
-  {
-    id: 6,
-    title: "Dune 2",
-    imageUrl: "dune2.jpg",
-  },
-  {
-    id: 7,
-    title: "Dune 2",
-    imageUrl: "dune2.jpg",
-  },
-  {
-    id: 8,
-    title: "Dune 2",
-    imageUrl: "dune2.jpg",
-  },
-  {
-    id: 9,
-    title: "Dune 2",
-    imageUrl: "dune2.jpg",
-  },
-  {
-    id: 10,
-    title: "Dune 2",
-    imageUrl: "dune2.jpg",
-  },
-  {
-    id: 11,
-    title: "Godzilla vs Kong",
-    imageUrl: "godzillakong.jpg",
-  },
-];
-
-const filmsPerPage = 6;
+interface Film {
+  id: number;
+  title: string;
+  image: string;
+}
 
 export default function AppFilms() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchValue, setSearchValue] = useState("");
+  const [films, setFilms] = useState<Film[]>([]);
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const filmsPerPage: number = 12;
 
-  const startIndex = (currentPage - 1) * filmsPerPage;
-  const endIndex = startIndex + filmsPerPage;
+  useEffect(() => {
+    getMovies();
+  }, []);
 
-  const filteredFilms = filmsData.filter((film) =>
+  async function getMovies() {
+    try {
+      const response = await ApiUtils.getApiInstanceJson().get("/movies");
+      setFilms(response.data);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des films :", error);
+    }
+  }
+
+  const handleSearchEntry = (searchEntry: string) => {
+    setSearchValue(searchEntry);
+    setCurrentPage(1); 
+  };
+
+  //calcule le debut et la fin pour la pagination
+  const startIndex: number = (currentPage - 1) * filmsPerPage;
+  const endIndex: number = startIndex + filmsPerPage;
+
+  // Filtre les films 
+  const filteredFilms = films.filter((film) =>
     film.title.toLowerCase().includes(searchValue.toLowerCase())
   );
 
   const filmsToShow = filteredFilms.slice(startIndex, endIndex);
-
-  const totalPages = Math.ceil(filteredFilms.length / filmsPerPage);
+  
+  const totalPages: number = Math.ceil(filteredFilms.length / filmsPerPage);
 
   const paginationSquares = [];
   for (let i = 1; i <= totalPages; i++) {
@@ -90,11 +59,6 @@ export default function AppFilms() {
         {i}
       </button>
     );
-  }
-
-  function handleSearchEntry(searchEntry: string) {
-    setSearchValue(searchEntry);
-    setCurrentPage(1);
   }
 
   return (
@@ -120,7 +84,7 @@ export default function AppFilms() {
             className={styles.filmContainer}
           >
             <img
-              src={film.imageUrl}
+              src={film.image}
               alt={film.title}
               className={styles.filmImage}
               style={{ width: "100%" }}
