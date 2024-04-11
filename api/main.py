@@ -20,7 +20,6 @@ class UserInfo(BaseModel):
     username: str
     name: str
     lastname: str
-    age: str
     language: str
     preferenceGenres: list
 
@@ -107,11 +106,6 @@ def get_user_profile(user_id: str, token_payload: dict = Depends(verify_token)):
     response = requests.get("http://localhost:3001/profil/", params={"userId": user_id})
     if response.status_code == 200:
         profile_data = response.json()
-        genre = {genre["id"]: genre["name"] for genre in get_genres()}
-        preferenceGenres = []
-        for info in profile_data["preferenceGenres"]:
-            preferenceGenres.append({"name": genre.get(int(info), ""), "id": info})
-        profile_data["preferenceGenres"] = preferenceGenres
         return profile_data
     else:
         raise HTTPException(status_code=404, detail="Profile not found")
@@ -277,9 +271,8 @@ def create_group(group: Group, token_payload: dict = Depends(verify_token)):
     response = requests.post("http://localhost:3001/group/create",
                              json={"userId": token_payload.get("userId"), "groupName": group.groupName})
     if response.status_code == 200:
-        print(response.json)
         token = response.json()
-        return token
+        return {"userId": token_payload.get("userId"),"token":token}
     elif response.status_code == 409:
         raise HTTPException(status_code=409, detail="Group already exists")
     else:
@@ -312,7 +305,7 @@ def register_user(userLogin: UserLogin,userInfos: UserInfo):
         print(payload)
         requests.post("http://localhost:3001/profil/firstConnection",
                                  json={"username": userLogin.username, "userId": payload.get('userId'),
-                                       "name": userInfos.name, "lastname": userInfos.lastname, "age": userInfos.age,
+                                       "name": userInfos.name, "lastname": userInfos.lastname,
                                        "language": userInfos.language, "preferenceGenres": userInfos.preferenceGenres})
 
 
