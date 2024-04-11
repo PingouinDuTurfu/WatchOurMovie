@@ -316,7 +316,7 @@ def register_user(userLogin: UserLogin,userInfos: UserInfo):
                                        "language": userInfos.language, "preferenceGenres": userInfos.preferenceGenres})
 
 
-        return {"userId": jwt.decode( token["token"], SECRET_KEY, algorithms=["HS256"])["userId"], "token": token["token"]}
+        return {"userId": payload.get('userId'), "token": token["token"]}
     elif response.status_code == 409:
         raise HTTPException(status_code=409, detail="User already exists")
     else:
