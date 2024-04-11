@@ -108,6 +108,10 @@ def get_user_profile(user_id: str, token_payload: dict = Depends(verify_token)):
     if response.status_code == 200:
         profile_data = response.json()
         genre = {genre["id"]: genre["name"] for genre in get_genres()}
+        preferenceGenres = []
+        for info in profile_data["preferenceGenres"]:
+            preferenceGenres.append({"name": genre.get(int(info), ""), "id": info})
+        profile_data["preferenceGenres"] = preferenceGenres
         return profile_data
     else:
         raise HTTPException(status_code=404, detail="Profile not found")
