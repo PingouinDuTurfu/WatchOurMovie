@@ -86,6 +86,57 @@ router.post('/addSeenMovie', async (req, res) => {
     }
 });
 
+router.post('/removeSeenMovie', async (req, res) => {
+    try {
+        const { userId, movie } = req.body;
+
+        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $pull: { moviesSeen: movie } }, { new: true });
+
+        if(profils) {
+            res.status(200).json(profils);
+        } else {
+            res.status(404).json({ error: 'Profil not found' });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'An error occurred' });
+    }
+});
+
+router.post('/addPreferenceGenre', async (req, res) => {
+    try {
+        const { userId, genre } = req.body;
+
+        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $addToSet: { preferenceGenres: genre } }, { new: true });
+
+        if(profils) {
+            res.status(200).json(profils);
+        } else {
+            res.status(404).json({ error: 'Profil not found' });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'An error occurred' });
+    }
+});
+
+router.post('/removePreferenceGenre', async (req, res) => {
+    try {
+        const { userId, genre } = req.body;
+
+        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $pull: { preferenceGenres: genre } }, { new: true });
+
+        if(profils) {
+            res.status(200).json(profils);
+        } else {
+            res.status(404).json({ error: 'Profil not found' });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'An error occurred' });
+    }
+});
+
 router.get('/list', async (req, res) => {
     try {
         const profils = await Profils.find();
