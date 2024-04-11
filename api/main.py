@@ -117,6 +117,10 @@ def get_user_profile(user_id: str, token_payload: dict = Depends(verify_token)):
     if response.status_code == 200:
         profile_data = response.json()
         genre = {genre["id"]: genre["name"] for genre in get_genres()}
+        preferenceGenres = []
+        for info in profile_data["preferenceGenres"]:
+            preferenceGenres.append({"name": genre.get(int(info), ""), "id": info})
+        profile_data["preferenceGenres"] = preferenceGenres
         return profile_data
     else:
         raise HTTPException(status_code=404, detail="Profile not found")
@@ -296,9 +300,8 @@ def login_user(user_login: UserLogin):
     response = requests.post("http://localhost:3000/auth/login",
                              json={"username": user_login.username, "hashPassword": user_login.hashPassword})
     if response.status_code == 200:
-        print(response.json)
         token = response.json()
-        return token
+        return {"userId": jwt.decode( token["token"], SECRET_KEY, algorithms=["HS256"])["userId"], "token": token["token"]}
     elif response.status_code == 401:
         raise HTTPException(status_code=401, detail="Invalid username or password")
     else:
@@ -316,13 +319,13 @@ def register_user(userLogin: UserLogin,userInfos: UserInfo):
             print(key)
         payload = jwt.decode(token.get('token'), SECRET_KEY, algorithms=["HS256"])
         print(payload)
-        response = requests.post("http://localhost:3001/profil/firstConnection",
+        requests.post("http://localhost:3001/profil/firstConnection",
                                  json={"username": userLogin.username, "userId": payload.get('userId'),
                                        "name": userInfos.name, "lastname": userInfos.lastname, "age": userInfos.age,
                                        "language": userInfos.language, "preferenceGenres": userInfos.preferenceGenres})
 
-        print(response)
-        return token
+
+        return {"userId": payload.get('userId'), "token": token["token"]}
     elif response.status_code == 409:
         raise HTTPException(status_code=409, detail="User already exists")
     else:
