@@ -25,7 +25,7 @@ router.post('/create', async (req, res) => {
         if(alreadyExist)
             return res.status(409).json({ error: 'Group already exists' });
 
-        await Profils.findOneAndUpdate({ userId: userId }, { $push: { groups: { groupName: groupName } } });
+        const profil = await Profils.findOneAndUpdate({ userId: userId }, { $push: { groups: { groupName: groupName }}}, { new: true });
         res.status(200).json({ groupName: groupName });
     } catch (error) {
         console.log(error);
@@ -37,7 +37,7 @@ router.post('/leave', async (req, res) => {
     try {
         const { userId, groupName } = req.body;
 
-        const profil = await Profils.findOneAndUpdate({ userId: userId }, { $pull: { groups: { groupName: groupName } } });
+        const profil = await Profils.findOneAndUpdate({ userId: userId }, { $pull: { groups: { groupName: groupName }}}, { new: true });
         res.status(200).json(profil);
     } catch (error) {
         console.log(error);
@@ -48,7 +48,7 @@ router.post('/leave', async (req, res) => {
 router.post('/join', async (req, res) => {
     try {
         const { userId, groupName } = req.body;
-        const profil = await Profils.findOneAndUpdate({ userId: userId }, { $push: { groups: { groupName: groupName } } });
+        const profil = await Profils.findOneAndUpdate({ userId: userId }, { $push: { groups: { groupName: groupName }}}, { new: true });
         res.status(200).json(profil);
     } catch (error) {
         console.log(error);
