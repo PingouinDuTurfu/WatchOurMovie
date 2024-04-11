@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import styles from "../css/AppConnexion.module.css";
 import { Button, FormControl, Paper, TextField } from "@mui/material";
 import ApiUtils from "../utils/ApiUtils";
@@ -10,20 +10,25 @@ export default function AppConnexion() {
   const [password, setPassword] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  console.log(ApiUtils.getAuthToken());
+  
+
+  async function handleConnexionClick() {
     try {
       const token = await ApiUtils.login(username, password);
       if (token) {
-        return <Navigate to="/profil" />;
+        console.log(token);
+        
+        navigate('/profil')
       } else {
         setError("Connexion échouée, veuillez réessayer");
       }
     } catch (error) {
-      console.error("Erreur lors de la connexion :", error);
       setError("Identifiant ou mot de passe incorrect.");
     }
-  };
+  }
 
   function handleUsernameChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { value } = event.target;
@@ -68,7 +73,7 @@ export default function AppConnexion() {
               value={password}
               onChange={handlePasswordChange}
             />
-            <Button variant="contained" color="primary" fullWidth onClick={handleLogin} disabled={!isFormValid}>
+            <Button variant="contained" color="primary" fullWidth onClick={handleConnexionClick} disabled={!isFormValid}>
               Se connecter
             </Button>
             {error && <p style={{ color: 'red' }}>{error}</p>}

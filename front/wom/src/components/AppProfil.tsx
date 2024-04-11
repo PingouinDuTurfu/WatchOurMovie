@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Avatar, Button, List, ListItem, ListItemText, Typography, MenuItem, TextField } from '@mui/material';
 import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
 import styles from "../css/AppProfil.module.css";
+import ApiUtils from '../utils/ApiUtils';
 
 export default function AppProfil() {
   // Exemple utilisateur

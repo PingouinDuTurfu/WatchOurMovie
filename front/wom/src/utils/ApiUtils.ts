@@ -31,22 +31,19 @@ export default abstract class ApiUtils {
     return ApiUtils.API_INSTANCE_FORM_DATA;
   }
 
-  static async login(
-    username: string,
-    password: string
-  ): Promise<string | null> {
-    try {
-      const hashedPassword = hashPassword(password);
+  static async login(username: string, password: string): Promise<string | null> {
+    const hashedPassword = hashPassword(password);
 
-      const requestBody: LoginRequestBody = {
-        username: username,
-        hashPassword: hashedPassword,
-      };
+    const requestBody: LoginRequestBody = {
+      username: username,
+      hashPassword: hashedPassword,
+    };
 
+    try { 
       const response = await ApiUtils.API_INSTANCE_JSON.post("/login", requestBody);
-
       const token = response.data.token;
-      ApiUtils.AUTH_TOKEN = token;
+
+      ApiUtils.setAuthToken = token;
       return token;
     } catch (error) {
       if (axios.isAxiosError(error)) {

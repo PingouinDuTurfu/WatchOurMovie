@@ -33,8 +33,8 @@ export default function AppInscription() {
   });
   const [isFormValid, setIsFormValid] = useState(false);
   const [error, setError] = useState('');
-
   const auth = ApiUtils.getAuthToken();
+
   useEffect(() => {
     fetchLanguages();
     fetchGenres();
@@ -116,8 +116,12 @@ export default function AppInscription() {
       const userInfos = { username, name: firstName, lastname: lastName, age: age, language: selectedLanguage, preferenceGenres: selectedGenres };
   
       const response = await ApiUtils.getApiInstanceJson().post('/register', { userLogin, userInfos });
+      console.log(response);
+      console.log(response.headers.autorization);
+      
       ApiUtils.setAuthToken(response.data.token);
-  
+      ApiUtils.setUserId(response.data.userId);
+      
       return <Navigate to="/profil" />;
     } catch (error) {
       setError('Pseudo déjà utilisé. Veuillez utiliser un autre pseudo.');
