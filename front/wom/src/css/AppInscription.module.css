@@ -9,6 +9,7 @@
   display: flex;
   padding: 0em 3em 0em 3em;
   justify-content: center;
+  margin-bottom: 3em;
 
   Button,
   .inputText,
@@ -29,4 +30,8 @@
 .deleteIcon {
   margin-left: 0.25em;
   vertical-align: center;
+}
+
+.error {
+  color: red;
 }

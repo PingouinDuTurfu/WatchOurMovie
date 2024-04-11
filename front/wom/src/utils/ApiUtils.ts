@@ -8,6 +8,7 @@ interface LoginRequestBody {
 
 export default abstract class ApiUtils {
   private static AUTH_TOKEN: string | null = null;
+  private static USER_ID: string | null = null;
   private static readonly API_BASE_URL = "http://localhost:4269";
   private static readonly API_INSTANCE_JSON = axios.create({
     baseURL: ApiUtils.API_BASE_URL,
@@ -68,5 +69,13 @@ export default abstract class ApiUtils {
 
   static setAuthToken(token: string | null): void {
     ApiUtils.AUTH_TOKEN = token;
+  }
+
+  static getUserId(): string | null {
+    return ApiUtils.USER_ID;
+  }
+
+  static setUserId(userId: string | null): void {
+    ApiUtils.USER_ID = userId;
   }
 }
