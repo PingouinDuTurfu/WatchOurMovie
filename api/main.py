@@ -1,6 +1,7 @@
 from collections import Counter
+from typing import List, Annotated
 
-from fastapi import FastAPI, HTTPException, Header
+from fastapi import FastAPI, HTTPException, Header, Body
 import requests
 import jwt
 from fastapi.params import Depends
@@ -16,12 +17,13 @@ class UserLogin(BaseModel):
     username: str
     hashPassword: str
 
+
 class UserInfo(BaseModel):
-    username: str
     name: str
     lastname: str
     language: str
     preferenceGenres: list
+
 
 class Group(BaseModel):
     groupName: str
@@ -272,7 +274,7 @@ def create_group(group: Group, token_payload: dict = Depends(verify_token)):
                              json={"userId": token_payload.get("userId"), "groupName": group.groupName})
     if response.status_code == 200:
         token = response.json()
-        return {"userId": token_payload.get("userId"),"token":token}
+        return {"userId": token_payload.get("userId"), "token": token}
     elif response.status_code == 409:
         raise HTTPException(status_code=409, detail="Group already exists")
     else:
@@ -285,7 +287,8 @@ def login_user(user_login: UserLogin):
                              json={"username": user_login.username, "hashPassword": user_login.hashPassword})
     if response.status_code == 200:
         token = response.json()
-        return {"userId": jwt.decode( token["token"], SECRET_KEY, algorithms=["HS256"])["userId"], "token": token["token"]}
+        return {"userId": jwt.decode(token["token"], SECRET_KEY, algorithms=["HS256"])["userId"],
+                "token": token["token"]}
     elif response.status_code == 401:
         raise HTTPException(status_code=401, detail="Invalid username or password")
     else:
@@ -293,7 +296,7 @@ def login_user(user_login: UserLogin):
 
 
 @app.post("/register")
-def register_user(userLogin: UserLogin,userInfos: UserInfo):
+def register_user(userLogin: UserLogin, userInfos: UserInfo):
     response = requests.post("http://localhost:3000/auth/register",
                              json={"username": userLogin.username, "hashPassword": userLogin.hashPassword})
     if response.status_code == 201:
@@ -304,12 +307,34 @@ def register_user(userLogin: UserLogin,userInfos: UserInfo):
         payload = jwt.decode(token.get('token'), SECRET_KEY, algorithms=["HS256"])
         print(payload)
         requests.post("http://localhost:3001/profil/firstConnection",
-                                 json={"username": userLogin.username, "userId": payload.get('userId'),
-                                       "name": userInfos.name, "lastname": userInfos.lastname,
-                                       "language": userInfos.language, "preferenceGenres": userInfos.preferenceGenres})
-
+                      json={"username": userLogin.username, "userId": payload.get('userId'),
+                            "name": userInfos.name, "lastname": userInfos.lastname,
+                            "language": userInfos.language, "preferenceGenres": userInfos.preferenceGenres})
 
         return {"userId": payload.get('userId'), "token": token["token"]}
+    elif response.status_code == 409:
+        raise HTTPException(status_code=409, detail="User already exists")
+    else:
+        raise HTTPException(status_code=500, detail="An error occurred")
+
+
+@app.post("/updateProfil")
+def update_pref_genre(preferenceGenres: Annotated[List[dict], Body()], language: Annotated[str, Body()],
+                      token_payload: dict = Depends(verify_token)):
+    print(preferenceGenres)
+    genres = get_genres()
+    for genre in preferenceGenres:
+        if genre not in genres:
+            raise HTTPException(status_code=400, detail="Genre not recognize")
+    print(language)
+
+    response = requests.post("http://localhost:3001/profil/updateProfile",
+                             json={"userId": token_payload.get("userId"), "preferenceGenres": preferenceGenres,
+                                   "language": language})
+    print(response.status_code)
+    if response.status_code == 200:
+        # to connect the user
+        return response.json()
     elif response.status_code == 409:
         raise HTTPException(status_code=409, detail="User already exists")
     else:

@@ -119,11 +119,13 @@ router.post('/addPreferenceGenre', async (req, res) => {
     }
 });
 
-router.post('/removePreferenceGenre', async (req, res) => {
+router.post('/updateProfile', async (req, res) => {
     try {
-        const { userId, genre } = req.body;
-
-        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $pull: { preferenceGenres: genre } }, { new: true });
+        const { userId, preferenceGenres, language } = req.body;
+        console.log(userId)
+        console.log(preferenceGenres)
+        console.log(language)
+        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $set: { preferenceGenres: preferenceGenres, language: language } }, { new: true });
 
         if(profils) {
             res.status(200).json(profils);
