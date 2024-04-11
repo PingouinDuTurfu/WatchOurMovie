@@ -54,7 +54,6 @@ router.post('/firstConnection', async (req, res) => {
             username: username,
             name: name,
             lastname: lastname,
-            age: age,
             language: language,
             moviesSeen: [],
             preferenceGenres: preferenceGenres,
