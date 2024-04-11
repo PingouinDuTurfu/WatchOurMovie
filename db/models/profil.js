@@ -6,8 +6,18 @@ const profilSchema = new database.Schema({
     name: { type: String, required: true },
     lastname: { type: String, required: true },
     language: { type: String, required: true },
-    moviesSeen: { type: [Number], required: true },
-    preferenceGenres: { type: [String], required: true },
+    moviesSeen: [
+        {
+            name: {type: String, required: true},
+            id: {type: Number, required: true}
+        }
+    ],
+    preferenceGenres: [
+        {
+            name: {type: String, required: true},
+            id: {type: Number, required: true}
+        }
+    ],
     groups: [
         {
             groupName: { type: String, required: true },

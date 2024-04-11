@@ -71,9 +71,9 @@ router.post('/firstConnection', async (req, res) => {
 
 router.post('/addSeenMovie', async (req, res) => {
     try {
-        const { userId, movieId } = req.body;
+        const { userId, movie } = req.body;
 
-        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $addToSet: { moviesSeen: movieId } }, { new: true });
+        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $addToSet: { moviesSeen: movie } }, { new: true });
 
         if(profils) {
             res.status(200).json(profils);
