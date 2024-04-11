@@ -25,6 +25,13 @@ class UserLogin(BaseModel):
     username: str
     hashPassword: str
 
+class UserInfo(BaseModel):
+    username: str
+    name: str
+    lastname: str
+    age: str
+    language: str
+    preferenceGenres: list
 
 class Group(BaseModel):
     groupName: str
@@ -299,7 +306,7 @@ def login_user(user_login: UserLogin):
 
 
 @app.post("/register")
-def register_user(userLogin: UserLogin):
+def register_user(userLogin: UserLogin,userInfos: UserInfo):
     response = requests.post("http://localhost:3000/auth/register",
                              json={"username": userLogin.username, "hashPassword": userLogin.hashPassword})
     if response.status_code == 201:
@@ -311,8 +318,8 @@ def register_user(userLogin: UserLogin):
         print(payload)
         response = requests.post("http://localhost:3001/profil/firstConnection",
                                  json={"username": userLogin.username, "userId": payload.get('userId'),
-                                       "name": "aaaaaaaaaaaaaaaa", "lastname": "bbbbbbbbbbbbbbbb", "age": True,
-                                       "language": "fr", "preferenceGenres": [28, 16, 35]})
+                                       "name": userInfos.name, "lastname": userInfos.lastname, "age": userInfos.age,
+                                       "language": userInfos.language, "preferenceGenres": userInfos.preferenceGenres})
 
         print(response)
         return token
