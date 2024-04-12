@@ -3,8 +3,9 @@ import { Avatar, Button, List, ListItem, ListItemText, Typography, MenuItem, Tex
 import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
 import styles from "../css/AppProfil.module.css";
 import { useAuth } from '../auth/AuthProvider';
-import ApiUtils from '../utils/ApiUtils'; // Importez ApiUtils
-import { useNavigate } from 'react-router-dom';
+import ApiUtils from '../utils/ApiUtils';
+import { Genre } from '../types/genreType';
+import { Group } from '../types/groupType';
 
 interface UserProfile {
   _id: string;
@@ -13,9 +14,9 @@ interface UserProfile {
   name: string;
   lastname: string;
   language: string;
-  moviesSeen: any[]; // Modify this type according to your data structure
+  moviesSeen: Genre[]; 
   preferenceGenres: { name: string; id: number; _id: string }[];
-  groups: any[]; // Modify this type according to your data structure
+  groups: Group[];
   __v: number;
 }
 
@@ -24,13 +25,6 @@ export default function AppProfil() {
   const [newGenre, setNewGenre] = useState('');
   const [addingGenre, setAddingGenre] = useState(false);
   const { authToken, userId, logout } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (authToken === null) {
-      navigate("/connexion");
-    }
-  }, [authToken]);
 
   useEffect(() => {
     fetchUserProfile();
@@ -94,7 +88,7 @@ export default function AppProfil() {
         <List>
           {userProfile.groups.map((group, index) => (
             <ListItem key={index}>
-              <ListItemText primary={group} />
+              <ListItemText primary={group.groupName} />
             </ListItem>
           ))}
         </List>

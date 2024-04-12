@@ -6,15 +6,11 @@ import { useEffect, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { hashPassword } from "../utils/HashUtils";
 import { useAuth } from '../auth/AuthProvider';
+import { Genre } from '../types/genreType';
 
 interface Language {
   iso_639_1: string;
   english_name: string;
-  name: string;
-}
-
-interface Genre {
-  id: number;
   name: string;
 }
 

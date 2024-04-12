@@ -30,6 +30,8 @@ export default abstract class ApiUtils {
       const response = await ApiUtils.API_INSTANCE_JSON.post("/login", requestBody);
       const token = response.data.token;
       const userId = response.data.userId;
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('userId', userId);
       login(token, userId);
       return token;
     } catch (error) {

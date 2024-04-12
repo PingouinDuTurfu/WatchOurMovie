@@ -18,15 +18,23 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [authToken, setAuthToken] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [authToken, setAuthToken] = useState<string | null>(() => {
+    return localStorage.getItem('authToken');
+  });
+  const [userId, setUserId] = useState<string | null>(() => {
+    return localStorage.getItem('userId');
+  });
 
   function login(token: string, userId: string) {
+    localStorage.setItem('authToken', token);
+    localStorage.setItem('userId', userId);
     setAuthToken(token);
     setUserId(userId);
   };
 
   function logout() {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userId');
     setAuthToken(null);
     setUserId(null);
   };
