@@ -333,13 +333,60 @@ def update_pref_genre(preferenceGenres: Annotated[List[dict], Body()], language:
                                    "language": language})
     print(response.status_code)
     if response.status_code == 200:
-        # to connect the user
         return response.json()
     elif response.status_code == 409:
         raise HTTPException(status_code=409, detail="User already exists")
     else:
         raise HTTPException(status_code=500, detail="An error occurred")
 
+
+@app.post("/addMovie")
+def add_movie(id: Annotated[int, Body()], title: Annotated[str, Body()],
+              token_payload: dict = Depends(verify_token)):
+    try:
+        get_movie_by_id(id)
+    except:
+        raise HTTPException(status_code=503, detail="Id movie not found")
+    response = requests.get("http://localhost:3001/profil/", params={"userId": token_payload.get("userId")})
+    if response.status_code == 200:
+        user = response.json()
+
+        if any(item.get("id") == id for item in user["moviesSeen"]):
+            raise HTTPException(status_code=409, detail="Movie already seen")
+        response = requests.post("http://localhost:3001/profil/addSeenMovie",
+                                 json={"userId": token_payload.get("userId"), "movie": {"title": title, "id": id}})
+        print(response.status_code)
+
+        if response.status_code == 200:
+            return response.json()
+        elif response.status_code == 409:
+            raise HTTPException(status_code=409, detail="User already exists")
+    else:
+        raise HTTPException(status_code=500, detail="An error occurred")
+
+@app.post("/removeMovie")
+def remove_movie(id: Annotated[int, Body()], title: Annotated[str, Body()], token_payload: dict = Depends(verify_token)):
+    try:
+        get_movie_by_id(id)
+    except:
+        raise HTTPException(status_code=503, detail="Id movie not found")
+    response = requests.get("http://localhost:3001/profil/", params={"userId": token_payload.get("userId")})
+    if response.status_code == 200:
+        user = response.json()
+
+        for movie in user["moviesSeen"]:
+            if movie.get("id") == id and movie.get("title") == title:
+                response = requests.post("http://localhost:3001/profil/addSeenMovie",
+                                         json={"userId": token_payload.get("userId"), "movie": {"title": title, "id": id}})
+
+        print(response.status_code)
+
+        if response.status_code == 200:
+            return response.json()
+        elif response.status_code == 409:
+            raise HTTPException(status_code=409, detail="User already exists")
+    else:
+        raise HTTPException(status_code=500, detail="An error occurred")
 
 if __name__ == "__main__":
     import uvicorn

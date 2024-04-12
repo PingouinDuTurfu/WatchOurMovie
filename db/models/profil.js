@@ -8,7 +8,7 @@ const profilSchema = new database.Schema({
     language: { type: String, required: true },
     moviesSeen: [
         {
-            name: {type: String, required: true},
+            title: {type: String, required: true},
             id: {type: Number, required: true}
         }
     ],
