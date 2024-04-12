@@ -1,3 +1,4 @@
+import collections
 from collections import Counter
 from typing import List, Annotated
 
@@ -212,17 +213,26 @@ def get_group_recommendation(language: str, groupName: str, random: bool, token_
     response = requests.get("http://localhost:3001/group/", params={"groupName": groupName})
     if response.status_code == 200:
         members = response.json()
-        movies_seen_counter = Counter()
-        genres_counter = Counter()
+        movies_seen_counter = collections.defaultdict(int)
+        genres_counter = collections.defaultdict(int)
         movies_seen = set()
 
         for member_data in members:
-            movies_seen_counter.update(member_data["moviesSeen"])
-            genres_counter.update(member_data["preferenceGenres"])
-            movies_seen.update(member_data["moviesSeen"])
-
-        most_seen_movies = movies_seen_counter.most_common(10)
-        most_common_genres = genres_counter.most_common(3)
+            member_movies_seen = member_data["moviesSeen"]
+            member_preference_genre = member_data["preferenceGenres"]
+            for movie in member_movies_seen:
+                movie_id = movie.get("id")
+                movies_seen_counter[movie_id] += 1
+                movies_seen.add(movie_id)
+            for genre in member_preference_genre:
+                genre_id = genre.get("id")
+                genres_counter[genre_id] += 1
+        print(movies_seen_counter)
+        print(genres_counter)
+        most_seen_movies = Counter(movies_seen_counter).most_common(10)
+        most_common_genres = Counter(genres_counter).most_common(3)
+        print(most_seen_movies)
+        print(most_common_genres)
         most_common_genre_ids = [genre[0] for genre in most_common_genres]
 
         recommendations = []
