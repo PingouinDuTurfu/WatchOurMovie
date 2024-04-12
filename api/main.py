@@ -239,30 +239,13 @@ def get_group_recommendation(language: str, groupName: str, random: bool, token_
         recommended_movie_ids = set()
 
         if movies_seen and not random:
-            # Attention pas encore testé
-            for movie_id, _ in most_seen_movies:
-                response = requests.post("http://localhost:3001/movie/recommendation/",
-                                         json={"movieId": movie_id, "language": language})
-                if response.status_code == 201:
-                    data = response.json()
-                    for movie in data['results']:
-                        if (movie['id'] not in movies_seen and movie['id'] not in recommended_movie_ids
-                                and all(genre_id in movie['genre_ids'] for genre_id in most_common_genre_ids)):
-                            recommendations.append(movie)
-                            recommended_movie_ids.add(movie['id'])
-
+            recommendations, recommended_movie_ids = recommendation_with_movie(most_seen_movies, language, movies_seen,
+                                                                               recommended_movie_ids, recommendations,
+                                                                               most_common_genre_ids)
         else:
-            for genre in most_common_genre_ids:
-
-                response = requests.post("http://localhost:3001/movie/discover/",
-                                         json={"with_genres": genre, "language": language})
-                if response.status_code == 201:
-                    data = response.json()
-                    for movie in data:
-                        if movie['id'] not in movies_seen and movie['id'] not in recommended_movie_ids:
-                            print(movie)
-                            recommendations.append(movie)
-                            recommended_movie_ids.add(movie['id'])
+            recommendations, recommended_movie_ids = recommendation_without_movie(language, movies_seen,
+                                                                               recommended_movie_ids, recommendations,
+                                                                               most_common_genre_ids)
 
         sorted_recommendations = sorted(recommendations, key=lambda x: x['popularity'], reverse=True)
         result_reco = []
@@ -276,6 +259,39 @@ def get_group_recommendation(language: str, groupName: str, random: bool, token_
     else:
         raise HTTPException(status_code=500, detail="An error occurred")
 
+
+def recommendation_with_movie(most_seen_movies: list, language: str, movies_seen: set, recommended_movie_ids: set,
+                              recommendations: list, most_common_genre_ids: list):
+    for movie_id, _ in most_seen_movies:
+        response = requests.post("http://localhost:3001/movie/recommendation/",
+                                 json={"movieId": movie_id, "language": language})
+        if response.status_code == 200 or response.status_code == 201:
+            data = response.json()
+            for movie in data:
+                if (movie['id'] not in movies_seen and movie['id'] not in recommended_movie_ids
+                        and any(genre_id in movie['genre_ids'] for genre_id in most_common_genre_ids)):
+                    recommendations.append(movie)
+                    recommended_movie_ids.add(movie['id'])
+    # if len(recommendations)<20:
+    #     recommendations, recommended_movie_ids = recommendation_without_movie(language, movies_seen,
+    #                                                                           recommended_movie_ids, recommendations,
+    #                                                                           most_common_genre_ids)
+    return recommendations, recommended_movie_ids
+
+def recommendation_without_movie(language: str, movies_seen: set, recommended_movie_ids: set,
+                              recommendations: list, most_common_genre_ids: list):
+    for genre in most_common_genre_ids:
+
+        response = requests.post("http://localhost:3001/movie/discover/",
+                                 json={"with_genres": genre, "language": language})
+        if response.status_code == 200 or response.status_code == 201:
+            data = response.json()
+            for movie in data:
+                if movie['id'] not in movies_seen and movie['id'] not in recommended_movie_ids:
+                    print(movie)
+                    recommendations.append(movie)
+                    recommended_movie_ids.add(movie['id'])
+    return recommendations, recommended_movie_ids
 
 @app.post("/group/create")
 def create_group(group: Group, token_payload: dict = Depends(verify_token)):
@@ -374,8 +390,10 @@ def add_movie(id: Annotated[int, Body()], title: Annotated[str, Body()],
     else:
         raise HTTPException(status_code=500, detail="An error occurred")
 
+
 @app.post("/removeMovie")
-def remove_movie(id: Annotated[int, Body()], title: Annotated[str, Body()], token_payload: dict = Depends(verify_token)):
+def remove_movie(id: Annotated[int, Body()], title: Annotated[str, Body()],
+                 token_payload: dict = Depends(verify_token)):
     try:
         get_movie_by_id(id)
     except:
@@ -387,7 +405,8 @@ def remove_movie(id: Annotated[int, Body()], title: Annotated[str, Body()], toke
         for movie in user["moviesSeen"]:
             if movie.get("id") == id and movie.get("title") == title:
                 response = requests.post("http://localhost:3001/profil/addSeenMovie",
-                                         json={"userId": token_payload.get("userId"), "movie": {"title": title, "id": id}})
+                                         json={"userId": token_payload.get("userId"),
+                                               "movie": {"title": title, "id": id}})
 
         print(response.status_code)
 
@@ -397,6 +416,7 @@ def remove_movie(id: Annotated[int, Body()], title: Annotated[str, Body()], toke
             raise HTTPException(status_code=409, detail="User already exists")
     else:
         raise HTTPException(status_code=500, detail="An error occurred")
+
 
 if __name__ == "__main__":
     import uvicorn
