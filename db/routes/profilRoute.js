@@ -89,7 +89,7 @@ router.post('/removeSeenMovie', async (req, res) => {
     try {
         const { userId, movie } = req.body;
 
-        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $pull: { moviesSeen: {"id":"823464"} } }, { new: true });
+        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $pull: { moviesSeen: movie } }, { new: true });
 
         if(profils) {
             res.status(200).json(profils);
