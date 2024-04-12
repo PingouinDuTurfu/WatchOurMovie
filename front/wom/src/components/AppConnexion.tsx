@@ -1,28 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import styles from "../css/AppConnexion.module.css";
 import { Button, FormControl, Paper, TextField } from "@mui/material";
 import ApiUtils from "../utils/ApiUtils";
+import { useAuth } from "../auth/AuthProvider";
 
 export default function AppConnexion() {
-  const auth = ApiUtils.getAuthToken();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { authToken, login } = useAuth();
 
-  console.log(ApiUtils.getAuthToken());
-  
+  useEffect(() => {
+    if (authToken !== null) {
+      navigate("/profil");
+    }
+  }, [authToken]);
 
   async function handleConnexionClick() {
     try {
-      const token = await ApiUtils.login(username, password);
-      if (token) {
-        console.log(token);
-        
-        navigate('/profil')
-      } else {
+      const token = await ApiUtils.authentification(username, password, login);
+      if (!token) {
         setError("Connexion échouée, veuillez réessayer");
       }
     } catch (error) {
@@ -42,10 +42,6 @@ export default function AppConnexion() {
     setPassword(value);
     setIsFormValid(value !== "" && !!username);
     setError(null);
-  }
-
-  if (auth) {
-    return <Navigate to="/profil" />;
   }
 
   return (
@@ -73,10 +69,16 @@ export default function AppConnexion() {
               value={password}
               onChange={handlePasswordChange}
             />
-            <Button variant="contained" color="primary" fullWidth onClick={handleConnexionClick} disabled={!isFormValid}>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={handleConnexionClick}
+              disabled={!isFormValid}
+            >
               Se connecter
             </Button>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
           </FormControl>
         </div>
         <div className={styles.inscriptionContainer}>

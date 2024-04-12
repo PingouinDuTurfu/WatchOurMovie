@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ApiUtils from '../utils/ApiUtils';
+import { CircularProgress } from '@mui/material';
 
 interface FilmDetails {
   title: string;
@@ -32,7 +33,11 @@ export default function AppFilmDetails() {
   }, [filmId]);
 
   if (!filmDetails) {
-    return <div>Loading...</div>;
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </div>
+    );
   }
 
   return (

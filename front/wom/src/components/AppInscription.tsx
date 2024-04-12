@@ -1,10 +1,11 @@
 import { Button, FormControl, MenuItem, Paper, TextField } from '@mui/material'
 import styles from "../css/AppInscription.module.css";
 import ApiUtils from '../utils/ApiUtils';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { hashPassword } from "../utils/HashUtils";
+import { useAuth } from '../auth/AuthProvider';
 
 interface Language {
   iso_639_1: string;
@@ -18,8 +19,8 @@ interface Genre {
 }
 
 export default function AppInscription() {
-  const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-  const [selectedGenre, setSelectedGenre] = useState('');
+  const [selectedGenres, setSelectedGenres] = useState<Genre[]>([]);
+  const [selectedGenre, setSelectedGenre] = useState<Genre | null>(null); // Change type to Genre | null
   const [languages, setLanguages] = useState<Language[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState('');
   const [genres, setGenres] = useState<Genre[]>([]);
@@ -33,7 +34,14 @@ export default function AppInscription() {
   });
   const [isFormValid, setIsFormValid] = useState(false);
   const [error, setError] = useState('');
-  const auth = ApiUtils.getAuthToken();
+  const navigate = useNavigate();
+  const { authToken, login } = useAuth();
+
+  useEffect(() => {
+    if (authToken !== null) {
+      navigate("/profil");
+    }
+  }, [authToken]);
 
   useEffect(() => {
     fetchLanguages();
@@ -45,10 +53,6 @@ export default function AppInscription() {
     const isAllFieldsFilled = Object.values(formData).every(val => val !== '');
     setIsFormValid(isGenreSelected && isAllFieldsFilled);
   }, [formData, selectedGenres]);
-
-  if (auth) {
-    return <Navigate to="/profil" />;
-  }
 
   async function fetchLanguages(){
     try {
@@ -73,7 +77,11 @@ export default function AppInscription() {
   }
 
   function handleGenreSelect(event: React.ChangeEvent<HTMLInputElement>) {
-    setSelectedGenre(event.target.value);
+    const genreName = event.target.value;
+    const selectedGenre = genres.find(genre => genre.name === genreName);
+    if (selectedGenre) {
+      setSelectedGenre(selectedGenre);
+    }
   }
 
   function handleLanguageSelect(event: React.ChangeEvent<HTMLInputElement>) {
@@ -81,23 +89,18 @@ export default function AppInscription() {
   }
 
   function handleAddGenre() {
-    if (selectedGenre && !selectedGenres.includes(selectedGenre)) {
+    if (selectedGenre && !selectedGenres.some(genre => genre.id === selectedGenre.id)) {
       setSelectedGenres([...selectedGenres, selectedGenre]);
-      setSelectedGenre('');
-  
-      const updatedGenres = genresToDisplay.filter(genre => genre.name !== selectedGenre);
+      setSelectedGenre(null); // Reset selectedGenre
+      const updatedGenres = genresToDisplay.filter(genre => genre.id !== selectedGenre.id);
       setGenresToDisplay(updatedGenres);
     }
   }
   
-  function handleRemoveGenre(genreToRemove: string) {
-    setSelectedGenres(selectedGenres.filter(genre => genre !== genreToRemove));
-    
-    const deletedGenre = genres.find(genre => genre.name === genreToRemove);
-    if (deletedGenre) {
-      const updatedGenresToDisplay = [...genresToDisplay, deletedGenre].sort((a, b) => a.name.localeCompare(b.name));
-      setGenresToDisplay(updatedGenresToDisplay);
-    }
+  function handleRemoveGenre(genreToRemove: Genre) {
+    setSelectedGenres(selectedGenres.filter(genre => genre.id !== genreToRemove.id));
+    const updatedGenresToDisplay = [...genresToDisplay, genreToRemove].sort((a, b) => a.name.localeCompare(b.name));
+    setGenresToDisplay(updatedGenresToDisplay);
   }
 
   function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -114,13 +117,10 @@ export default function AppInscription() {
       const hashedPassword = hashPassword(password);
       const userLogin = { username, hashPassword: hashedPassword };
       const userInfos = { username, name: firstName, lastname: lastName, age: age, language: selectedLanguage, preferenceGenres: selectedGenres };
-  
-      const response = await ApiUtils.getApiInstanceJson().post('/register', { userLogin, userInfos });
-      console.log(response);
-      console.log(response.headers.autorization);
       
-      ApiUtils.setAuthToken(response.data.token);
-      ApiUtils.setUserId(response.data.userId);
+      const response = await ApiUtils.getApiInstanceJson().post('/register', { userLogin, userInfos });
+      
+      login(response.data.token, response.data.userId);
       
       return <Navigate to="/profil" />;
     } catch (error) {
@@ -162,7 +162,7 @@ export default function AppInscription() {
               id="select-genre"
               select
               label="Genre"
-              value={selectedGenre}
+              value={selectedGenre ? selectedGenre.name : ''}
               onChange={handleGenreSelect}
             >
               {genresToDisplay.map(genre => (
@@ -174,9 +174,9 @@ export default function AppInscription() {
             <Button onClick={handleAddGenre} variant="outlined">Ajouter</Button>
             <Paper className={styles.selectedGenres}>
               Genres préférés : {selectedGenres.map(genre => (
-                <span key={genre} className={styles.selectedGenre}>
+                <span key={genre.id} className={styles.selectedGenre}>
                   <Button onClick={() => handleRemoveGenre(genre)} size="small">
-                    {genre}
+                    {genre.name}
                     <DeleteIcon className={styles.deleteIcon}/>
                   </Button>
                 </span>

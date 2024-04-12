@@ -1,10 +1,10 @@
 import { Outlet, Navigate } from 'react-router-dom'
-import ApiUtils from '../utils/ApiUtils'
+import { useAuth } from '../auth/AuthProvider';
 
 const AppRoutesPrivate = () => {
-    const auth = ApiUtils.getAuthToken();
+    const { authToken } = useAuth();
     return(
-        auth? <Outlet/> : <Navigate to="/connexion"/>
+        authToken? <Outlet/> : <Navigate to="/connexion"/>
     )
 }
 

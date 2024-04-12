@@ -1,36 +1,77 @@
-import { useState } from 'react';
-import { Avatar, Button, List, ListItem, ListItemText, Typography, MenuItem, TextField } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Avatar, Button, List, ListItem, ListItemText, Typography, MenuItem, TextField, CircularProgress } from '@mui/material';
 import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
 import styles from "../css/AppProfil.module.css";
-import ApiUtils from '../utils/ApiUtils';
+import { useAuth } from '../auth/AuthProvider';
+import ApiUtils from '../utils/ApiUtils'; // Importez ApiUtils
+import { useNavigate } from 'react-router-dom';
+
+interface UserProfile {
+  _id: string;
+  userId: string;
+  username: string;
+  name: string;
+  lastname: string;
+  language: string;
+  moviesSeen: any[]; // Modify this type according to your data structure
+  preferenceGenres: { name: string; id: number; _id: string }[];
+  groups: any[]; // Modify this type according to your data structure
+  __v: number;
+}
 
 export default function AppProfil() {
-  // Exemple utilisateur
-  const user = {
-    name: 'Prénom',
-    lastname: 'Exemple',
-    email: 'nom@exemple.com',
-    pseudo: 'SuperExemple',
-    groups: ['Group 1', 'Group 2', 'Group 3'],
-    genres: ['Romance', 'Comedy']
-  };
-
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [newGenre, setNewGenre] = useState('');
   const [addingGenre, setAddingGenre] = useState(false);
+  const { authToken, userId, logout } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (authToken === null) {
+      navigate("/connexion");
+    }
+  }, [authToken]);
+
+  useEffect(() => {
+    fetchUserProfile();
+  }, [userId, authToken]);
 
   function handleEditProfile() {
-    // ToDo
+    // Handle editing profile
   }
 
   function handleClickWatched() {
-    // ToDo
+    // Handle clicking watched movies
   }
 
   function handleAddGenre() {
     // Add newGenre to user's genres
     // Reset newGenre state
     setAddingGenre(false);
-    // ToDo
+    // Handle adding genre to user's profile
+  }
+
+  async function fetchUserProfile() {
+    try {
+      if (userId && authToken) {
+        const response = await ApiUtils.getApiInstanceJson().get<UserProfile>(`/profil/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        setUserProfile(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  }
+
+  if (!userProfile) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </div>
+    );
   }
 
   return (
@@ -39,20 +80,19 @@ export default function AppProfil() {
         <Avatar alt="User Avatar" className={styles.avatar} />
         <div className={styles.userInfo}>
           <div className={styles.nameContainer}>
-            <Typography variant="h4">{user.pseudo}</Typography>
+            <Typography variant="h4">{userProfile.username}</Typography>
             <Button startIcon={<EditIcon />} onClick={handleEditProfile} className={styles.editButton}>
               Modifier
             </Button>
           </div>
-          <Typography variant="body1">Prénom : {user.name}</Typography>
-          <Typography variant="body1">Nom : {user.lastname}</Typography>
-          <Typography variant="body1">Email : {user.email}</Typography>
+          <Typography variant="body1">Prénom : {userProfile.name}</Typography>
+          <Typography variant="body1">Nom : {userProfile.lastname}</Typography>
         </div>
       </div>
       <div>
         <Typography variant="h6">Groupes</Typography>
         <List>
-          {user.groups.map((group, index) => (
+          {userProfile.groups.map((group, index) => (
             <ListItem key={index}>
               <ListItemText primary={group} />
             </ListItem>
@@ -60,9 +100,9 @@ export default function AppProfil() {
         </List>
         <Typography variant="h6">Genres</Typography>
         <List>
-          {user.genres.map((genre, index) => (
+          {userProfile.preferenceGenres.map((genre, index) => (
             <ListItem key={index}>
-              <ListItemText primary={genre} />
+              <ListItemText primary={genre.name} />
             </ListItem>
           ))}
           {addingGenre ? (
@@ -92,6 +132,9 @@ export default function AppProfil() {
 
       <Button variant="contained" color="primary" onClick={handleClickWatched} className={styles.watchedButton}>
         Films Vus
+      </Button>
+      <Button variant="contained" color="secondary" onClick={() => ApiUtils.logout(logout)}>
+        Déconnexion
       </Button>
     </div>
   );
