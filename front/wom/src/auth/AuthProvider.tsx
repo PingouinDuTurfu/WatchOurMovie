@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
+import { Navigate } from 'react-router-dom';
 
 interface AuthContextType {
   authToken: string | null;
@@ -36,6 +37,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('userId');
     setAuthToken(null);
     setUserId(null);
+    
+    return <Navigate to="/" />;
   };
 
   return (

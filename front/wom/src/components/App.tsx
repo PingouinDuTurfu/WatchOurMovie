@@ -14,7 +14,6 @@ function App() {
       <BrowserRouter>
         <AppMenu setFooterNavValue={setFooterNavValue} />
         <div className={styles.MainContent}>
-          <AppDeconnexion />
           <AppRouter/>
         </div>
         <AppFooter footerNavValue={footerNavValue} setFooterNavValue={setFooterNavValue} />

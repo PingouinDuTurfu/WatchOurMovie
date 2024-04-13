@@ -17,7 +17,7 @@ export default function AppConnexion() {
     if (authToken !== null) {
       navigate("/profil");
     }
-  }, [authToken]);
+  });
 
   async function handleConnexionClick() {
     try {

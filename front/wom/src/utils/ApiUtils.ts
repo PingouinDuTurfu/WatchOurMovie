@@ -7,7 +7,7 @@ interface LoginRequestBody {
 }
 
 export default abstract class ApiUtils {
-  private static readonly API_BASE_URL = "http://localhost:4269";
+  private static readonly API_BASE_URL = "http://localhost:3004";
   private static readonly API_INSTANCE_JSON = axios.create({
     baseURL: ApiUtils.API_BASE_URL,
     headers: {

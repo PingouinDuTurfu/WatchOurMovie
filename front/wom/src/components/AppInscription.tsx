@@ -32,7 +32,7 @@ export default function AppInscription() {
     if (authToken !== null) {
       navigate("/profil");
     }
-  }, [authToken]);
+  });
 
   useEffect(() => {
     fetchLanguages();

@@ -1,11 +1,13 @@
-FROM alpine:3.19
+FROM node:latest
 
 WORKDIR /app
 
-COPY . /app
+COPY ./front/wom/package*.json ./
 
 RUN npm install
 
-ENV PORT=3001
+EXPOSE 3003
+
+COPY ./front/wom ./
 
 CMD ["npm", "start"]
