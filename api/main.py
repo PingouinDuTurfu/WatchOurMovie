@@ -418,7 +418,7 @@ def login_user(user_login: UserLogin):
     if response.status_code == 200:
         token = response.json()
         save_log("POST Login {username: " + user_login.username + "} : status_code=200",
-                 jwt.decode(token["token"]))
+                 jwt.decode(token["token"], SECRET_KEY, algorithms=["HS256"]))
         return {"userId": jwt.decode(token["token"], SECRET_KEY, algorithms=["HS256"])["userId"],
                 "token": token["token"]}
     elif response.status_code == 401:
