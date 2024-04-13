@@ -7,8 +7,10 @@ const Recommendations = require('../models/recommendation');
 
 router.post('/', async (req, res) => {
     try {
-        const { id, language } = req.body.id;
+        const { id, language } = req.body;
+        console.log(id, language)
         const movie = await Movies.findOne({ id: id, language: language });
+        console.log(movie)
 
         if(movie) {
             res.status(200).json(movie);
@@ -23,6 +25,10 @@ router.post('/', async (req, res) => {
         })
             .then(response => response.json())
             .then(async data => {
+                console.log(data);
+                data["genre_ids"]= data["genres"].map(genre => genre.id);
+                data["language"]=language;
+                console.log(data);
                 const movie = new Movies(data);
                 await movie.save();
                 res.status(201).json(movie);
@@ -81,8 +87,11 @@ router.post('/discover', async (req, res) => {
                     response: data.results
                 });
 
-                const movies = data.results.map(movie => new Movies(movie));
-
+                const movies = data.results.map(movie => {
+                    movie["language"] = language;
+                    return new Movies(movie);
+                });
+                
                 try {
                     await request.save();
                 } catch (error) {
@@ -92,6 +101,7 @@ router.post('/discover', async (req, res) => {
                 try {
                     await Movies.insertMany(movies);
                 } catch (error) {
+                    console.log("yup")
                     if(error.code !== 11000)
                         throw error;
                 }
@@ -140,12 +150,17 @@ router.post('/search', async (req, res) => {
         })
             .then(response => response.json())
             .then(async data => {
+                data["language"] = language
                 const query1 = new Query({
                     request: params,
                     response: data.results
                 });
 
-                const movies = data.results.map(movie => new Movies(movie));
+                const movies = data.results.map(movie => {
+                    movie["language"] = language;
+                    return new Movies(movie);
+                });
+
 
                 try {
                     await query1.save();
@@ -202,12 +217,17 @@ router.post('/recommendation', async (req, res) => {
         })
             .then(response => response.json())
             .then(async data => {
+                data["language"] = language
                 const request = new Recommendations({
                     request: params,
                     response: data.results
                 });
 
-                const movies = data.results.map(movie => new Movies(movie));
+                const movies = data.results.map(movie => {
+                    movie["language"] = language;
+                    return new Movies(movie);
+                });
+
 
                 try {
                     await request.save();

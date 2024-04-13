@@ -29,6 +29,11 @@ class UserInfo(BaseModel):
 class Group(BaseModel):
     groupName: str
 
+class UpdatePreferenceGenre(BaseModel):
+    preferenceGenres: List[dict]
+
+class UpdateLanguage(BaseModel):
+    language: str
 
 def transform_to_movie(movie_data, genres):
     movie_object = {
@@ -75,9 +80,19 @@ def verify_token(token: str = Depends(get_token_auth_header)):
 
 
 # Routes
+def verify_lang(language):
+    languages = get_languages()
+    for lang in languages:
+        if lang["iso_639_1"] == language:
+            return True
+    return False
+
+
 @app.get("/movies/{page}")
-def get_movies(page: int):
-    response = requests.post("http://localhost:3001/movie/discover", json={"page": page})
+def get_movies(page: int, language: str):
+    if not (verify_lang(language)):
+        raise HTTPException(status_code=404, detail="Language not found")
+    response = requests.post("http://localhost:3001/movie/discover", json={"page": page, "language": language})
     if response.status_code == 200 or response.status_code == 201:
         result_movie = []
         movies = response.json()
@@ -90,8 +105,11 @@ def get_movies(page: int):
 
 
 @app.get("/movies/{title_search}/{page}")
-def get_movies(title_search: str,page: int):
-    response = requests.post("http://localhost:3001/movie/searchMovie", json={"page": page,"title_search": title_search})
+def get_movies(title_search: str, page: int, language: str):
+    if not (verify_lang(language)):
+        raise HTTPException(status_code=404, detail="Language not found")
+    response = requests.post("http://localhost:3001/movie/search",
+                             json={"page": page, "query": title_search, "language": language})
     if response.status_code == 200 or response.status_code == 201:
         result_movie = []
         movies = response.json()
@@ -104,8 +122,10 @@ def get_movies(title_search: str,page: int):
 
 
 @app.get("/movie/{movie_id}")
-def get_movie_by_id(movie_id: int):
-    response = requests.post("http://localhost:3001/movie/", json={"id": movie_id})
+def get_movie_by_id(movie_id: int, language: str):
+    if not (verify_lang(language)):
+        raise HTTPException(status_code=404, detail="Language not found")
+    response = requests.post("http://localhost:3001/movie/", json={"id": movie_id, "language": language})
     if response.status_code == 200 or response.status_code == 201:
         print(response.json)
         movie = response.json()
@@ -162,15 +182,8 @@ def get_genres():
 @app.get("/groups")
 def get_groups():
     response = requests.get("http://localhost:3001/group/list")
-    if response.status_code == 200:
-        group_names = {}
-        for entry in response.json():
-            for group in entry.get('groups'):
-                group_name = group['groupName']
-                # Increment count for the group name
-                group_names[group_name] = group_names.get(group_name, 0) + 1
-
-        return group_names
+    if response.status_code == 200 and response.json():
+        return response.json()
     else:
         raise HTTPException(status_code=500, detail="An error occurred")
 
@@ -178,18 +191,22 @@ def get_groups():
 @app.get("/group/infos/{groupName}")
 def get_group_by_id(groupName: str):
     response = requests.get("http://localhost:3001/group/", params={"groupName": groupName})
+    print(response.status_code)
     if response.status_code == 200:
         group = response.json()
         result = []
-        genres_counter = Counter()
+        genres_counter = collections.defaultdict(int)
         for member in group:
             result.append(transform_to_user(member))
-            genres_counter.update(member["preferenceGenres"])
+            for genre in member["preferenceGenres"]:
+                genres_counter[genre["id"]] += 1
         genres = get_genres()
         genre = {genre["id"]: genre["name"] for genre in genres}
+        most_common_genres = Counter(genres_counter).most_common(3)
         preferenceGenres = []
-        for info in genres_counter.most_common(3):
+        for info in most_common_genres:
             preferenceGenres.append({"name": genre.get(int(info[0]), ""), "freq": info[1]})
+
         return {"groupName": groupName, "members": result, "preferenceGenres": preferenceGenres}
     elif response.status_code == 404:
         raise HTTPException(status_code=404, detail="Group not found")
@@ -222,8 +239,9 @@ def leave_group(group: Group, token_payload: dict = Depends(verify_token)):
 
 
 @app.get("/group/recommendation")
-def get_group_recommendation(language: str, groupName: str, random: bool, token_payload: dict = Depends(verify_token)):
-    print("groupnameé :" + groupName)
+def get_group_recommendation(language: str, groupName: str, onMoviesSeen: bool, token_payload: dict = Depends(verify_token)):
+    if not (verify_lang(language)):
+        raise HTTPException(status_code=404, detail="Language not found")
     response = requests.get("http://localhost:3001/group/", params={"groupName": groupName})
     if response.status_code == 200:
         members = response.json()
@@ -241,18 +259,16 @@ def get_group_recommendation(language: str, groupName: str, random: bool, token_
             for genre in member_preference_genre:
                 genre_id = genre.get("id")
                 genres_counter[genre_id] += 1
-        print(movies_seen_counter)
-        print(genres_counter)
+
         most_seen_movies = Counter(movies_seen_counter).most_common(10)
         most_common_genres = Counter(genres_counter).most_common(3)
-        print(most_seen_movies)
-        print(most_common_genres)
+
         most_common_genre_ids = [genre[0] for genre in most_common_genres]
 
         recommendations = []
         recommended_movie_ids = set()
 
-        if movies_seen and not random:
+        if movies_seen and not onMoviesSeen:
             recommendations, recommended_movie_ids = recommendation_with_movie(most_seen_movies, language, movies_seen,
                                                                                recommended_movie_ids, recommendations,
                                                                                most_common_genre_ids)
@@ -277,6 +293,8 @@ def get_group_recommendation(language: str, groupName: str, random: bool, token_
 
 def recommendation_with_movie(most_seen_movies: list, language: str, movies_seen: set, recommended_movie_ids: set,
                               recommendations: list, most_common_genre_ids: list):
+    if not (verify_lang(language)):
+        raise HTTPException(status_code=404, detail="Language not found")
     for movie_id, _ in most_seen_movies:
         response = requests.post("http://localhost:3001/movie/recommendation/",
                                  json={"movieId": movie_id, "language": language})
@@ -296,6 +314,8 @@ def recommendation_with_movie(most_seen_movies: list, language: str, movies_seen
 
 def recommendation_without_movie(language: str, movies_seen: set, recommended_movie_ids: set,
                                  recommendations: list, most_common_genre_ids: list):
+    if not (verify_lang(language)):
+        raise HTTPException(status_code=404, detail="Language not found")
     for genre in most_common_genre_ids:
 
         response = requests.post("http://localhost:3001/movie/discover/",
@@ -342,6 +362,11 @@ def login_user(user_login: UserLogin):
 def register_user(userLogin: UserLogin, userInfos: UserInfo):
     response = requests.post("http://localhost:3000/auth/register",
                              json={"username": userLogin.username, "hashPassword": userLogin.hashPassword})
+    genres = get_genres()
+    for genre in userInfos.preferenceGenres:
+        if genre not in genres:
+            raise HTTPException(status_code=400, detail="Genre not recognize")
+
     if response.status_code == 201:
         # to connect the user
         token = login_user(userLogin)
@@ -362,16 +387,15 @@ def register_user(userLogin: UserLogin, userInfos: UserInfo):
 
 
 @app.post("/updateGenre")
-def update_pref_genre(preferenceGenres: Annotated[List[dict], Body(...)],
+def update_pref_genre(preferenceGenres: UpdatePreferenceGenre,
                       token_payload: dict = Depends(verify_token)):
-    print(preferenceGenres)
     genres = get_genres()
-    for genre in preferenceGenres:
+    for genre in preferenceGenres.preferenceGenres:
         if genre not in genres:
             raise HTTPException(status_code=400, detail="Genre not recognize")
 
     response = requests.post("http://localhost:3001/profil/updateGenre",
-                             json={"userId": token_payload.get("userId"), "preferenceGenres": preferenceGenres})
+                             json={"userId": token_payload.get("userId"), "preferenceGenres": preferenceGenres.preferenceGenres})
     print(response.status_code)
     if response.status_code == 200:
         return response.json()
@@ -382,18 +406,13 @@ def update_pref_genre(preferenceGenres: Annotated[List[dict], Body(...)],
 
 
 @app.post("/updateLang")
-def update_lang(language: Annotated[str, Body(...)],
+def update_lang(language: UpdateLanguage,
                 token_payload: dict = Depends(verify_token)):
-    langs = get_languages()
-    print(language)
-
-    for lang in langs:
-        if lang not in langs:
-            raise HTTPException(status_code=400, detail="Genre not recognize")
-    print(language)
+    if not (verify_lang(language.language)):
+        raise HTTPException(status_code=404, detail="Language not found")
 
     response = requests.post("http://localhost:3001/profil/updateLanguage",
-                             json={"userId": token_payload.get("userId"), "language": language})
+                             json={"userId": token_payload.get("userId"), "language": language.language})
     print(response.status_code)
     if response.status_code == 200:
         return response.json()
@@ -404,10 +423,13 @@ def update_lang(language: Annotated[str, Body(...)],
 
 
 @app.post("/addMovie")
-def add_movie(id: Annotated[int, Body(...)], title: Annotated[str, Body(...)],
+def add_movie(id: Annotated[int, Body(...)], title: Annotated[str, Body(...)], language: str,
               token_payload: dict = Depends(verify_token)):
+
+    if not (verify_lang(language)):
+        raise HTTPException(status_code=404, detail="Language not found")
     try:
-        movie = get_movie_by_id(id)
+        movie = get_movie_by_id(id, language)
     except:
         raise HTTPException(status_code=503, detail="Id movie not found")
     response = requests.get("http://localhost:3001/profil/", params={"userId": token_payload.get("userId")})
@@ -417,7 +439,8 @@ def add_movie(id: Annotated[int, Body(...)], title: Annotated[str, Body(...)],
         if any(item.get("id") == id for item in user["moviesSeen"]):
             raise HTTPException(status_code=409, detail="Movie already seen")
         response = requests.post("http://localhost:3001/profil/addSeenMovie",
-                                 json={"userId": token_payload.get("userId"), "movie": {"title": movie.get("title"), "image": movie.get("image"),"id": id}})
+                                 json={"userId": token_payload.get("userId"),
+                                       "movie": {"title": movie.get("title"), "image": movie.get("image"), "id": id}})
         print(response.status_code)
 
         if response.status_code == 200:
@@ -429,10 +452,12 @@ def add_movie(id: Annotated[int, Body(...)], title: Annotated[str, Body(...)],
 
 
 @app.post("/removeMovie")
-def remove_movie(id: Annotated[int, Body(...)], title: Annotated[str, Body(...)],
+def remove_movie(id: Annotated[int, Body(...)], title: Annotated[str, Body(...)], language: str,
                  token_payload: dict = Depends(verify_token)):
+    if not(verify_lang(language)):
+        raise HTTPException(status_code=404, detail="Language not found")
     try:
-        get_movie_by_id(id)
+        get_movie_by_id(id, language)
     except:
         raise HTTPException(status_code=503, detail="Id movie not found")
     response = requests.get("http://localhost:3001/profil/", params={"userId": token_payload.get("userId")})
