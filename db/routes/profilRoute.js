@@ -119,13 +119,12 @@ router.post('/addPreferenceGenre', async (req, res) => {
     }
 });
 
-router.post('/updateProfile', async (req, res) => {
+router.post('/updateGenre', async (req, res) => {
     try {
-        const { userId, preferenceGenres, language } = req.body;
+        const { userId, preferenceGenres} = req.body;
         console.log(userId)
         console.log(preferenceGenres)
-        console.log(language)
-        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $set: { preferenceGenres: preferenceGenres, language: language } }, { new: true });
+        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $set: { preferenceGenres: preferenceGenres} }, { new: true });
 
         if(profils) {
             res.status(200).json(profils);
@@ -138,6 +137,24 @@ router.post('/updateProfile', async (req, res) => {
     }
 });
 
+
+router.post('/updateLanguage', async (req, res) => {
+    try {
+        const { userId, language } = req.body;
+        console.log(userId)
+        console.log(language)
+        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $set: {  language: language } }, { new: true });
+
+        if(profils) {
+            res.status(200).json(profils);
+        } else {
+            res.status(404).json({ error: 'Profil not found' });
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'An error occurred' });
+    }
+});
 router.get('/list', async (req, res) => {
     try {
         const profils = await Profils.find();

@@ -75,9 +75,23 @@ def verify_token(token: str = Depends(get_token_auth_header)):
 
 
 # Routes
-@app.get("/movies")
-def get_movies():
-    response = requests.post("http://localhost:3001/movie/discover")
+@app.get("/movies/{page}")
+def get_movies(page: int):
+    response = requests.post("http://localhost:3001/movie/discover", json={"page": page})
+    if response.status_code == 200 or response.status_code == 201:
+        result_movie = []
+        movies = response.json()
+        genre = {genre["id"]: genre["name"] for genre in get_genres()}
+        for movie in movies:
+            result_movie.append(transform_to_movie(movie, genre))
+        return result_movie
+    else:
+        raise HTTPException(status_code=500, detail="An error occurred")
+
+
+@app.get("/movies/{title_search}/{page}")
+def get_movies(title_search: str,page: int):
+    response = requests.post("http://localhost:3001/movie/searchMovie", json={"page": page,"title_search": title_search})
     if response.status_code == 200 or response.status_code == 201:
         result_movie = []
         movies = response.json()
@@ -244,8 +258,9 @@ def get_group_recommendation(language: str, groupName: str, random: bool, token_
                                                                                most_common_genre_ids)
         else:
             recommendations, recommended_movie_ids = recommendation_without_movie(language, movies_seen,
-                                                                               recommended_movie_ids, recommendations,
-                                                                               most_common_genre_ids)
+                                                                                  recommended_movie_ids,
+                                                                                  recommendations,
+                                                                                  most_common_genre_ids)
 
         sorted_recommendations = sorted(recommendations, key=lambda x: x['popularity'], reverse=True)
         result_reco = []
@@ -278,8 +293,9 @@ def recommendation_with_movie(most_seen_movies: list, language: str, movies_seen
     #                                                                           most_common_genre_ids)
     return recommendations, recommended_movie_ids
 
+
 def recommendation_without_movie(language: str, movies_seen: set, recommended_movie_ids: set,
-                              recommendations: list, most_common_genre_ids: list):
+                                 recommendations: list, most_common_genre_ids: list):
     for genre in most_common_genre_ids:
 
         response = requests.post("http://localhost:3001/movie/discover/",
@@ -292,6 +308,7 @@ def recommendation_without_movie(language: str, movies_seen: set, recommended_mo
                     recommendations.append(movie)
                     recommended_movie_ids.add(movie['id'])
     return recommendations, recommended_movie_ids
+
 
 @app.post("/group/create")
 def create_group(group: Group, token_payload: dict = Depends(verify_token)):
@@ -344,19 +361,39 @@ def register_user(userLogin: UserLogin, userInfos: UserInfo):
         raise HTTPException(status_code=500, detail="An error occurred")
 
 
-@app.post("/updateProfil")
-def update_pref_genre(preferenceGenres: Annotated[List[dict], Body()], language: Annotated[str, Body()],
+@app.post("/updateGenre")
+def update_pref_genre(preferenceGenres: Annotated[List[dict], Body(...)],
                       token_payload: dict = Depends(verify_token)):
     print(preferenceGenres)
     genres = get_genres()
     for genre in preferenceGenres:
         if genre not in genres:
             raise HTTPException(status_code=400, detail="Genre not recognize")
+
+    response = requests.post("http://localhost:3001/profil/updateGenre",
+                             json={"userId": token_payload.get("userId"), "preferenceGenres": preferenceGenres})
+    print(response.status_code)
+    if response.status_code == 200:
+        return response.json()
+    elif response.status_code == 409:
+        raise HTTPException(status_code=409, detail="User already exists")
+    else:
+        raise HTTPException(status_code=500, detail="An error occurred")
+
+
+@app.post("/updateLang")
+def update_lang(language: Annotated[str, Body(...)],
+                token_payload: dict = Depends(verify_token)):
+    langs = get_languages()
     print(language)
 
-    response = requests.post("http://localhost:3001/profil/updateProfile",
-                             json={"userId": token_payload.get("userId"), "preferenceGenres": preferenceGenres,
-                                   "language": language})
+    for lang in langs:
+        if lang not in langs:
+            raise HTTPException(status_code=400, detail="Genre not recognize")
+    print(language)
+
+    response = requests.post("http://localhost:3001/profil/updateLanguage",
+                             json={"userId": token_payload.get("userId"), "language": language})
     print(response.status_code)
     if response.status_code == 200:
         return response.json()
@@ -367,10 +404,10 @@ def update_pref_genre(preferenceGenres: Annotated[List[dict], Body()], language:
 
 
 @app.post("/addMovie")
-def add_movie(id: Annotated[int, Body()], title: Annotated[str, Body()],
+def add_movie(id: Annotated[int, Body(...)], title: Annotated[str, Body(...)],
               token_payload: dict = Depends(verify_token)):
     try:
-        get_movie_by_id(id)
+        movie = get_movie_by_id(id)
     except:
         raise HTTPException(status_code=503, detail="Id movie not found")
     response = requests.get("http://localhost:3001/profil/", params={"userId": token_payload.get("userId")})
@@ -380,7 +417,7 @@ def add_movie(id: Annotated[int, Body()], title: Annotated[str, Body()],
         if any(item.get("id") == id for item in user["moviesSeen"]):
             raise HTTPException(status_code=409, detail="Movie already seen")
         response = requests.post("http://localhost:3001/profil/addSeenMovie",
-                                 json={"userId": token_payload.get("userId"), "movie": {"title": title, "id": id}})
+                                 json={"userId": token_payload.get("userId"), "movie": {"title": movie.get("title"), "image": movie.get("image"),"id": id}})
         print(response.status_code)
 
         if response.status_code == 200:
@@ -392,7 +429,7 @@ def add_movie(id: Annotated[int, Body()], title: Annotated[str, Body()],
 
 
 @app.post("/removeMovie")
-def remove_movie(id: Annotated[int, Body()], title: Annotated[str, Body()],
+def remove_movie(id: Annotated[int, Body(...)], title: Annotated[str, Body(...)],
                  token_payload: dict = Depends(verify_token)):
     try:
         get_movie_by_id(id)
@@ -403,12 +440,10 @@ def remove_movie(id: Annotated[int, Body()], title: Annotated[str, Body()],
         user = response.json()
 
         for movie in user["moviesSeen"]:
-            if movie.get("id") == id and movie.get("title") == title:
-                response = requests.post("http://localhost:3001/profil/addSeenMovie",
+            if movie.get("id") == id:
+                response = requests.post("http://localhost:3001/profil/removeSeenMovie",
                                          json={"userId": token_payload.get("userId"),
-                                               "movie": {"title": title, "id": id}})
-
-        print(response.status_code)
+                                               "movie": {"title": movie.get("title"), "id": movie.get("id")}})
 
         if response.status_code == 200:
             return response.json()
