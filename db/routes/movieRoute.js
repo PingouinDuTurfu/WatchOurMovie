@@ -6,15 +6,15 @@ const Recommendations = require('../models/recommendation');
 
 router.post('/', async (req, res) => {
     try {
-        const id = req.body.id;
-        const movie = await Movies.findOne({ id: id });
+        const { id, language } = req.body.id;
+        const movie = await Movies.findOne({ id: id, language: language });
 
         if(movie) {
             res.status(200).json(movie);
             return;
         }
 
-        fetch(`https://api.themoviedb.org/3/movie/${id}`, {
+        fetch(`https://api.themoviedb.org/3/movie/${id}?language=${language}`, {
             method: 'GET',
             headers: {
                 authorization: `Bearer ${process.env.TMDB_API_KEY}`

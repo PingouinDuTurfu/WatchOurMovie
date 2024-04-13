@@ -23,6 +23,7 @@ const profilSchema = new database.Schema({
     groups: [
         {
             groupName: { type: String, required: true },
+            _id: false
         }
     ]
 }, { collection: 'profils' });
