@@ -32,7 +32,7 @@ router.get('/fromUsername', async (req, res) => {
 
 router.post('/firstConnection', async (req, res) => {
     try {
-        const { userId, username, name, lastname, age, language } = req.body;
+        const { userId, username, name, lastname, language } = req.body;
 
         const profils = await Profils.findOne({ userId: userId });
 
@@ -41,8 +41,6 @@ router.post('/firstConnection', async (req, res) => {
 
         const preferenceGenres = [];
         const groups = [];
-
-
 
         req.body.preferenceGenres.forEach(genre => {
             if(genre)
