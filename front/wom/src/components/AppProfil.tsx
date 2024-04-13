@@ -3,10 +3,10 @@ import { Avatar, Button, List, ListItem, ListItemText, Typography, MenuItem, Tex
 import { Add as AddIcon } from '@mui/icons-material';
 import styles from "../css/AppProfil.module.css";
 import { useAuth } from '../auth/AuthProvider';
-import ApiUtils from '../utils/ApiUtils';
 import { Genre } from '../types/genreType';
 import GenresService from '../services/GenresService';
 import { UserProfile } from '../types/profileType';
+import ProfileService from '../services/ProfileService';
 
 export default function AppProfil() {
   const [addingGenre, setAddingGenre] = useState(false);
@@ -55,20 +55,10 @@ export default function AppProfil() {
     }
   }
   
-
   async function fetchUserProfile() {
-    try {
-      if (userId && authToken) {
-        const response = await ApiUtils.getApiInstanceJson().get<UserProfile>(`/profil/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
-        setUserProfile(response.data);
-      }
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-    }
+    if (userId === null || authToken === null) return;
+    const userProfile = await ProfileService.fetchUserProfile(userId, authToken);
+    setUserProfile(userProfile);
   }
 
   async function fetchGenres() {
@@ -88,7 +78,11 @@ export default function AppProfil() {
     );
   }
 
-  async function editGenres(Genres: Genre[]) {
+  async function editGenres(genres: Genre[]) {
+    // post genres
+  }
+
+  async function editLanguage(languageShort: string[]) {
     // post genres
   }
 

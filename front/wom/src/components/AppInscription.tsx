@@ -8,12 +8,7 @@ import { hashPassword } from "../utils/HashUtils";
 import { useAuth } from '../auth/AuthProvider';
 import { Genre } from '../types/genreType';
 import GenresService from '../services/GenresService';
-
-interface Language {
-  iso_639_1: string;
-  english_name: string;
-  name: string;
-}
+import { Language } from '../types/languageType';
 
 export default function AppInscription() {
   const [genres, setGenres] = useState<Genre[]>([]);

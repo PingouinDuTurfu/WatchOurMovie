@@ -2,6 +2,7 @@ import { Button } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import ApiUtils from '../utils/ApiUtils';
 import { useAuth } from '../auth/AuthProvider';
+import GroupsService from '../services/GroupsService';
 
 export default function AppGroupeDetails() {
   const { groupName } = useParams();
@@ -10,12 +11,10 @@ export default function AppGroupeDetails() {
 
   async function handleLeaveGroup() {
     try {
-      await ApiUtils.getApiInstanceJson().post('/group/leave', { groupName }, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-      navigate('/groupes');
+      if (groupName && authToken) {
+        await GroupsService.leaveGroup(groupName, authToken);
+        navigate('/groupes');
+      }
     } catch (error) {
       console.error('Erreur lors de la sortie du groupe :', error);
     }

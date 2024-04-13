@@ -1,12 +1,15 @@
+// AppGroupes.tsx
+
 import { useState, useEffect } from 'react';
 import { Paper, TextField, Button, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import styles from '../css/AppGroupes.module.css';
 import { useAuth } from '../auth/AuthProvider';
-import GroupsService from '../services/GroupsService'; // Importer le service
+import GroupsService from '../services/GroupsService';
 import { Group } from '../types/groupType';
 import ApiUtils from '../utils/ApiUtils';
 import { UserProfile } from '../types/profileType';
+import ProfileService from '../services/ProfileService';
 
 export default function AppGroupes() {
   const [searchValue, setSearchValue] = useState('');
@@ -16,21 +19,22 @@ export default function AppGroupes() {
   const { authToken, userId } = useAuth();
 
   useEffect(() => {
-    const fetchGroups = async () => {
-      try {
-        const groups = await GroupsService.retrieveGroups();
-        setGroups(groups);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des groupes :', error);
-      }
-    };
     fetchUserProfile();
     fetchGroups();
   }, []);
 
-  const filteredGroups = Array.isArray(groups) ? groups.filter(group =>
+  const filteredGroups = groups.filter(group =>
     group.groupName.toLowerCase().includes(searchValue.toLowerCase())
-  ) : [];  
+  );  
+
+  async function fetchGroups() {
+    try {
+      const groups = await GroupsService.retrieveGroups();
+      setGroups(groups);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des groupes :', error);
+    }
+  };
 
   async function handleCreateGroup() {
     try {
@@ -40,24 +44,33 @@ export default function AppGroupes() {
         },
       });
       setNewGroupName('');
+      fetchUserProfile();
     } catch (error) {
       console.error('Erreur lors de la création du groupe :', error);
     }
   };
 
-  async function fetchUserProfile() {
+  async function handleJoinGroup(groupName: string) {
     try {
-      if (userId && authToken) {
-        const response = await ApiUtils.getApiInstanceJson().get<UserProfile>(`/profil/${userId}`, {
+      await ApiUtils.getApiInstanceJson().post(
+        '/group/join',
+        { groupName },
+        {
           headers: {
             Authorization: `Bearer ${authToken}`,
           },
-        });
-        setUserProfile(response.data);
-      }
+        }
+      );
+      fetchUserProfile();
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      console.error('Erreur lors de la jointure du groupe :', error);
     }
+  };
+
+  async function fetchUserProfile() {
+    if (userId === null || authToken === null) return;
+    const userProfile = await ProfileService.fetchUserProfile(userId, authToken);
+    setUserProfile(userProfile);
   }
 
   return (
@@ -84,9 +97,10 @@ export default function AppGroupes() {
           />
         </div>
         {filteredGroups.map(group => (
-          <Paper className={styles.groupContainer}>
+          <Paper key={group.groupName} className={styles.groupContainer}>
             <Typography>{group.groupName}</Typography>
-            <Button variant="outlined">Rejoindre</Button>
+            <Button variant="outlined">Voir</Button>
+            <Button variant="outlined" onClick={() => handleJoinGroup(group.groupName)}>Rejoindre</Button>
           </Paper>
         ))}
       </Paper>
@@ -94,7 +108,7 @@ export default function AppGroupes() {
       <Paper className={styles.paperContainer}>
         <Typography variant="h6">Vos groupes</Typography>
         {userProfile?.groups.map(group => (
-          <Paper className={styles.groupContainer}>
+          <Paper key={group.groupName} className={styles.groupContainer}>
             <Typography>{group.groupName}</Typography>
             <Button component={Link} to={`/groupes/${group.groupName}`} variant="outlined">Recommandation</Button>
           </Paper>

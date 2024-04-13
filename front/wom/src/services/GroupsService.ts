@@ -5,9 +5,25 @@ class GroupsService {
   async retrieveGroups(): Promise<Group[]> {
     try {
       const response = await ApiUtils.getApiInstanceJson().get('/groups');
-      return response.data;
+      const groupNames = Object.keys(response.data);
+      const groups: Group[] = groupNames.map((groupName) => ({
+        groupName,
+      }));
+      return groups;
     } catch (error) {
-      throw new Error('Erreur lors de la récupération des genres');
+      throw new Error('Erreur lors de la récupération des groupes');
+    }
+  }
+
+  async leaveGroup(groupName: string, authToken: string): Promise<void> {
+    try {
+      await ApiUtils.getApiInstanceJson().post('/group/leave', { groupName }, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+    } catch (error) {
+      throw new Error('Erreur lors de la sortie du groupe');
     }
   }
 }
