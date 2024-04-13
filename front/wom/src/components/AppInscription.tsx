@@ -7,6 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { hashPassword } from "../utils/HashUtils";
 import { useAuth } from '../auth/AuthProvider';
 import { Genre } from '../types/genreType';
+import GenresService from '../services/GenresService';
 
 interface Language {
   iso_639_1: string;
@@ -15,16 +16,15 @@ interface Language {
 }
 
 export default function AppInscription() {
+  const [genres, setGenres] = useState<Genre[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<Genre[]>([]);
-  const [selectedGenre, setSelectedGenre] = useState<Genre | null>(null); // Change type to Genre | null
+  const [selectedGenre, setSelectedGenre] = useState<Genre | null>(null);
   const [languages, setLanguages] = useState<Language[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState('');
-  const [genres, setGenres] = useState<Genre[]>([]);
   const [genresToDisplay, setGenresToDisplay] = useState<Genre[]>([]);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    age: '',
     username: '',
     password: ''
   });
@@ -62,11 +62,11 @@ export default function AppInscription() {
     }
   }  
 
-  async function fetchGenres(){
+  async function fetchGenres() {
     try {
-      const response = await ApiUtils.getApiInstanceJson().get('/genres');
-      setGenres(response.data);
-      setGenresToDisplay(response.data);
+      const genres = await GenresService.retireveGenres();
+      setGenres(genres);
+      setGenresToDisplay(genres);
     } catch (error) {
       setError('Erreur lors de la récupération des genres');
     }
@@ -87,7 +87,7 @@ export default function AppInscription() {
   function handleAddGenre() {
     if (selectedGenre && !selectedGenres.some(genre => genre.id === selectedGenre.id)) {
       setSelectedGenres([...selectedGenres, selectedGenre]);
-      setSelectedGenre(null); // Reset selectedGenre
+      setSelectedGenre(null);
       const updatedGenres = genresToDisplay.filter(genre => genre.id !== selectedGenre.id);
       setGenresToDisplay(updatedGenres);
     }
@@ -109,10 +109,10 @@ export default function AppInscription() {
 
   async function registerUser() {
     try {
-      const { firstName, lastName, age, username, password } = formData;
+      const { firstName, lastName, username, password } = formData;
       const hashedPassword = hashPassword(password);
       const userLogin = { username, hashPassword: hashedPassword };
-      const userInfos = { username, name: firstName, lastname: lastName, age: age, language: selectedLanguage, preferenceGenres: selectedGenres };
+      const userInfos = { name: firstName, lastname: lastName, language: selectedLanguage, preferenceGenres: selectedGenres };
       
       const response = await ApiUtils.getApiInstanceJson().post('/register', { userLogin, userInfos });
       
@@ -136,7 +136,6 @@ export default function AppInscription() {
           <FormControl>
             <TextField className={styles.inputText} id="firstName" name="firstName" label="Prénom" variant="outlined" fullWidth onChange={handleInputChange} />
             <TextField className={styles.inputText} id="lastName" name="lastName" label="Nom" variant="outlined" fullWidth onChange={handleInputChange} />
-            <TextField className={styles.inputText} id="age" name="age" label="Age" variant="outlined" fullWidth onChange={handleInputChange} />
             <TextField className={styles.inputText} id="username" name="username" label="Pseudo" variant="outlined" fullWidth onChange={handleInputChange} />
             <TextField className={styles.inputText} id="password" name="password" label="Mot de passe" type="password" variant="outlined" fullWidth onChange={handleInputChange} />
             <TextField

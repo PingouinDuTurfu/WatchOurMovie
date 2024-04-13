@@ -10,10 +10,7 @@ interface AppFooterProps {
   setFooterNavValue: React.Dispatch<React.SetStateAction<number | undefined>>;
 }
 
-export default function AppFooter({
-  footerNavValue,
-  setFooterNavValue,
-}: AppFooterProps) {
+export default function AppFooter({footerNavValue, setFooterNavValue}: AppFooterProps) {
   const { authToken } = useAuth();
 
   return (
@@ -38,22 +35,22 @@ export default function AppFooter({
         className={footerNavValue === 1 ? styles.activeIcon : ""}
       />
       {authToken && (
-        <>
-          <BottomNavigationAction
-            label="Groupes"
-            icon={<People />}
-            component={Link}
-            to="/groupes"
-            className={footerNavValue === 2 ? styles.activeIcon : ""}
-          />
-          <BottomNavigationAction
-            label="Profil"
-            icon={<Person />}
-            component={Link}
-            to="/profil"
-            className={footerNavValue === 3 ? styles.activeIcon : ""}
-          />
-        </>
+        <BottomNavigationAction
+          label="Groupes"
+          icon={<People />}
+          component={Link}
+          to="/groupes"
+          className={footerNavValue === 2 ? styles.activeIcon : ""}
+        />
+      )}
+      {authToken && (
+        <BottomNavigationAction
+          label="Profil"
+          icon={<Person />}
+          component={Link}
+          to="/profil"
+          className={footerNavValue === 3 ? styles.activeIcon : ""}
+        />
       )}
       <BottomNavigationAction
         label="CGU"
@@ -65,3 +62,4 @@ export default function AppFooter({
     </BottomNavigation>
   );
 }
+

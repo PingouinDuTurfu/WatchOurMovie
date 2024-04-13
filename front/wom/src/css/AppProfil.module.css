@@ -31,3 +31,8 @@
 .watchedButton {
   margin-top: 1em;
 }
+
+.genreSelect {
+  margin: 0.5em;
+  width: 200px;
+}

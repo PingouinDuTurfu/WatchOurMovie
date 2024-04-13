@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "../css/AppConnexion.module.css";
 import { Button, FormControl, Paper, TextField } from "@mui/material";
 import ApiUtils from "../utils/ApiUtils";
@@ -44,6 +44,12 @@ export default function AppConnexion() {
     setError(null);
   }
 
+  function handleKeyPress(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key === "Enter" && isFormValid) {
+      handleConnexionClick();
+    }
+  }
+
   return (
     <div className={styles.container}>
       <Paper elevation={3} className={styles.paperConnexion}>
@@ -68,6 +74,7 @@ export default function AppConnexion() {
               fullWidth
               value={password}
               onChange={handlePasswordChange}
+              onKeyDown={handleKeyPress}
             />
             <Button
               variant="contained"

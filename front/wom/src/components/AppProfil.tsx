@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Avatar, Button, List, ListItem, ListItemText, Typography, MenuItem, TextField, CircularProgress } from '@mui/material';
-import { Edit as EditIcon, Add as AddIcon } from '@mui/icons-material';
+import { Add as AddIcon } from '@mui/icons-material';
 import styles from "../css/AppProfil.module.css";
 import { useAuth } from '../auth/AuthProvider';
 import ApiUtils from '../utils/ApiUtils';
 import { Genre } from '../types/genreType';
 import { Group } from '../types/groupType';
+import GenresService from '../services/GenresService';
+import { Film } from '../types/genreFilm';
 
 interface UserProfile {
   _id: string;
@@ -14,36 +16,60 @@ interface UserProfile {
   name: string;
   lastname: string;
   language: string;
-  moviesSeen: Genre[]; 
+  moviesSeen: Film[]; 
   preferenceGenres: { name: string; id: number; _id: string }[];
   groups: Group[];
   __v: number;
 }
 
 export default function AppProfil() {
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [newGenre, setNewGenre] = useState('');
   const [addingGenre, setAddingGenre] = useState(false);
-  const { authToken, userId, logout } = useAuth();
+  const [showingMovies, setShowingMovies] = useState(false);
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [selectedGenre, setSelectedGenre] = useState<Genre | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const { authToken, userId } = useAuth();
 
   useEffect(() => {
     fetchUserProfile();
   }, [userId, authToken]);
 
-  function handleEditProfile() {
-    // Handle editing profile
+  useEffect(() => {
+    fetchGenres();
+    console.log(authToken);
+    console.log(userId);
+  }, []);
+
+  function handleGenreSelect(event: React.ChangeEvent<HTMLInputElement>) {
+    const genreName = event.target.value;
+    const selectedGenre = genres.find(genre => genre.name === genreName);
+    if (selectedGenre) {
+      setSelectedGenre(selectedGenre);
+    }
   }
 
-  function handleClickWatched() {
-    // Handle clicking watched movies
+  function handleClickWatchedMovies() {
+    if (userProfile) {
+      setShowingMovies(true);
+    } else {
+      console.log("Aucun film vu");
+    }
   }
 
   function handleAddGenre() {
-    // Add newGenre to user's genres
-    // Reset newGenre state
-    setAddingGenre(false);
-    // Handle adding genre to user's profile
+    if (userProfile !== null) {
+      if (selectedGenre && !userProfile.preferenceGenres.some(genre => genre.id === selectedGenre.id)) {
+        const updatedProfile = {
+          ...userProfile,
+          preferenceGenres: [...userProfile.preferenceGenres, selectedGenre]
+        };
+        // setUserProfile(updatedProfile);
+        setSelectedGenre(null);
+        setAddingGenre(false);
+      }
+    }
   }
+  
 
   async function fetchUserProfile() {
     try {
@@ -57,6 +83,15 @@ export default function AppProfil() {
       }
     } catch (error) {
       console.error('Error fetching user profile:', error);
+    }
+  }
+
+  async function fetchGenres() {
+    try {
+      const genres = await GenresService.retireveGenres();
+      setGenres(genres);
+    } catch (error) {
+      console.log('Erreur lors de la récupération des genres');
     }
   }
 
@@ -75,16 +110,15 @@ export default function AppProfil() {
         <div className={styles.userInfo}>
           <div className={styles.nameContainer}>
             <Typography variant="h4">{userProfile.username}</Typography>
-            <Button startIcon={<EditIcon />} onClick={handleEditProfile} className={styles.editButton}>
-              Modifier
-            </Button>
           </div>
           <Typography variant="body1">Prénom : {userProfile.name}</Typography>
           <Typography variant="body1">Nom : {userProfile.lastname}</Typography>
+          <Typography variant="body1">Langue : {userProfile.language}</Typography>
         </div>
       </div>
       <div>
         <Typography variant="h6">Groupes</Typography>
+          
         <List>
           {userProfile.groups.map((group, index) => (
             <ListItem key={index}>
@@ -102,18 +136,19 @@ export default function AppProfil() {
           {addingGenre ? (
             <>
               <TextField
-                id="select-genre"
-                select
-                label="Genre"
-                defaultValue="Action"
-                value={newGenre}
-                onChange={(e) => setNewGenre(e.target.value)}
-                fullWidth
-              >
-                <MenuItem value="Action">Action</MenuItem>
-                <MenuItem value="Adventure">Adventure</MenuItem>
-                <MenuItem value="Drama">Drama</MenuItem>
-              </TextField>
+              className={styles.genreSelect}
+              id="select-genre"
+              select
+              label="Genre"
+              value={selectedGenre ? selectedGenre.name : ''}
+              onChange={handleGenreSelect}
+            >
+              {genres.map(genre => (
+                <MenuItem key={genre.id} value={genre.name}>
+                  {genre.name}
+                </MenuItem>
+              ))}
+            </TextField>
               <Button onClick={handleAddGenre} variant="contained">Ajouter</Button>
             </>
           ) : (
@@ -124,12 +159,18 @@ export default function AppProfil() {
         </List>
       </div>
 
-      <Button variant="contained" color="primary" onClick={handleClickWatched} className={styles.watchedButton}>
+      <Button variant="contained" color="primary" onClick={handleClickWatchedMovies} className={styles.watchedButton}>
         Films Vus
       </Button>
-      <Button variant="contained" color="secondary" onClick={() => ApiUtils.logout(logout)}>
-        Déconnexion
-      </Button>
+      {showingMovies && (
+        <List>
+        {userProfile?.moviesSeen.map((movie, index) => (
+          <ListItem key={index}>
+            <ListItemText primary={movie.title} />
+          </ListItem>
+        ))}
+      </List>
+      )}
     </div>
   );
 }
