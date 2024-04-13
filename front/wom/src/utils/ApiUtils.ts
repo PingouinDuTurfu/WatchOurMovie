@@ -15,8 +15,17 @@ export default abstract class ApiUtils {
     },
   });
 
-  static getApiInstanceJson(): AxiosInstance {
-    return ApiUtils.API_INSTANCE_JSON;
+  static getApiInstanceJson(authToken?: string): AxiosInstance {
+    const headers: any = {
+      "Content-Type": "application/json",
+    };
+    if (authToken) {
+      headers["Authorization"] = `Bearer ${authToken}`;
+    }
+    return axios.create({
+      baseURL: ApiUtils.API_BASE_URL,
+      headers: headers,
+    });
   }
 
   static async authentification(username: string, password: string, login: (token: string, userId: string) => void): Promise<string | null> {

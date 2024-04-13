@@ -1,5 +1,3 @@
-// AppGroupes.tsx
-
 import { useState, useEffect } from 'react';
 import { Paper, TextField, Button, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -38,11 +36,8 @@ export default function AppGroupes() {
 
   async function handleCreateGroup() {
     try {
-      await ApiUtils.getApiInstanceJson().post('/group/create', { groupName: newGroupName }, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
+      if(!authToken) return;
+      await ApiUtils.getApiInstanceJson(authToken).post('/group/create', { groupName: newGroupName });
       setNewGroupName('');
       fetchUserProfile();
     } catch (error) {
@@ -52,14 +47,10 @@ export default function AppGroupes() {
 
   async function handleJoinGroup(groupName: string) {
     try {
-      await ApiUtils.getApiInstanceJson().post(
+      if(!authToken) return;
+      await ApiUtils.getApiInstanceJson(authToken).post(
         '/group/join',
-        { groupName },
-        {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        }
+        { groupName }
       );
       fetchUserProfile();
     } catch (error) {

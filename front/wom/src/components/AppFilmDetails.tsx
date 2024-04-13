@@ -40,14 +40,10 @@ export default function AppFilmDetails() {
     if (filmDetails) {
       try {
         setLoading(true);
-        await ApiUtils.getApiInstanceJson().post(
+        if (!authToken) return;
+        await ApiUtils.getApiInstanceJson(authToken).post(
           '/addMovie',
-          { id: filmDetails.id, title: filmDetails.title },
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
+          { id: filmDetails.id, title: filmDetails.title }
         );
         setLoading(false);
       } catch (error) {

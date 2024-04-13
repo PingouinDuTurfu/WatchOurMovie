@@ -17,11 +17,7 @@ class GroupsService {
 
   async leaveGroup(groupName: string, authToken: string): Promise<void> {
     try {
-      await ApiUtils.getApiInstanceJson().post('/group/leave', { groupName }, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
+      await ApiUtils.getApiInstanceJson(authToken).post('/group/leave', { groupName });
     } catch (error) {
       throw new Error('Erreur lors de la sortie du groupe');
     }

@@ -5,14 +5,8 @@ class UserService {
   async fetchUserProfile(userId: string, authToken: string): Promise<UserProfile | null> {
     try {
       if (userId && authToken) {
-        const response = await ApiUtils.getApiInstanceJson().get<UserProfile>(
-          `/profil/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
+        const response = await ApiUtils.getApiInstanceJson(authToken).get<UserProfile>(
+          `/profil/${userId}`);
         return response.data;
       }
       return null;
