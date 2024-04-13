@@ -40,3 +40,17 @@ services:
             - "27017:27017"
         env_file:
             - .env
+    api:
+        build:
+            context: .
+            dockerfile: ./api/Dockerfile
+        container_name: wom_api
+        ports:
+            - "3004:3004"
+        env_file:
+            - .env
+        depends_on:
+            - mongodb
+            - db_manager
+            - auth_provider
+            - log
