@@ -1,4 +1,5 @@
 import collections
+import os
 from collections import Counter
 from typing import List, Annotated
 
@@ -12,10 +13,19 @@ app = FastAPI()
 
 SECRET_KEY = "4b8e08f2c3a4d5e6f7101234567890abcdef1234567890abcdef1234567890ab"
 
-AUTH_URL = "http://localhost:3000"
-DB_URL = "http://localhost:3001"
-LOG_URL = "http://localhost:3002"
+AUTH_PORT = os.getenv('AUTH_PORT', '')
+DB_PORT = os.getenv('DB_MANAGER_PORT', '')
+LOG_PORT = os.getenv('LOG_PORT', '')
+API_PORT = os.getenv('API_PORT', '')
 
+SECRET_KEY = os.getenv('JWT_SECRET', '')
+
+if not AUTH_PORT or not DB_PORT or not LOG_PORT or not API_PORT or not SECRET_KEY:
+    raise ValueError("Missing environment variables")
+
+AUTH_URL = "http://auth_provider:" + AUTH_PORT
+DB_URL = "http://db_manager:" + DB_PORT
+LOG_URL = "http://log:" + LOG_PORT
 
 class UserLogin(BaseModel):
     username: str
@@ -585,4 +595,4 @@ def remove_movie(movieToRemove: RemoveMovie,
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=4269)
+    uvicorn.run(app, host="0.0.0.0", port=int(API_PORT))
