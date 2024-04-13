@@ -35,6 +35,15 @@ class UpdatePreferenceGenre(BaseModel):
 class UpdateLanguage(BaseModel):
     language: str
 
+
+class AddMovie(BaseModel):
+    id: int
+    language: str
+
+class RemoveMovie(BaseModel):
+    id: int
+    language: str
+
 def transform_to_movie(movie_data, genres):
     movie_object = {
         "title": movie_data.get("title", ""),
@@ -423,24 +432,24 @@ def update_lang(language: UpdateLanguage,
 
 
 @app.post("/addMovie")
-def add_movie(id: Annotated[int, Body(...)], title: Annotated[str, Body(...)], language: str,
+def add_movie(movieToAdd: AddMovie,
               token_payload: dict = Depends(verify_token)):
 
-    if not (verify_lang(language)):
+    if not (verify_lang(movieToAdd.language)):
         raise HTTPException(status_code=404, detail="Language not found")
     try:
-        movie = get_movie_by_id(id, language)
+        movie = get_movie_by_id(movieToAdd.id, movieToAdd.language)
     except:
         raise HTTPException(status_code=503, detail="Id movie not found")
     response = requests.get("http://localhost:3001/profil/", params={"userId": token_payload.get("userId")})
     if response.status_code == 200:
         user = response.json()
 
-        if any(item.get("id") == id for item in user["moviesSeen"]):
+        if any(item.get("id") == movieToAdd.id for item in user["moviesSeen"]):
             raise HTTPException(status_code=409, detail="Movie already seen")
         response = requests.post("http://localhost:3001/profil/addSeenMovie",
                                  json={"userId": token_payload.get("userId"),
-                                       "movie": {"title": movie.get("title"), "image": movie.get("image"), "id": id}})
+                                       "movie": {"title": movie.get("title"), "image": movie.get("image"), "id": movie.get("id")}})
         print(response.status_code)
 
         if response.status_code == 200:
@@ -452,12 +461,12 @@ def add_movie(id: Annotated[int, Body(...)], title: Annotated[str, Body(...)], l
 
 
 @app.post("/removeMovie")
-def remove_movie(id: Annotated[int, Body(...)], title: Annotated[str, Body(...)], language: str,
+def remove_movie(movieToRemove: RemoveMovie,
                  token_payload: dict = Depends(verify_token)):
-    if not(verify_lang(language)):
+    if not(verify_lang(movieToRemove.language)):
         raise HTTPException(status_code=404, detail="Language not found")
     try:
-        get_movie_by_id(id, language)
+        get_movie_by_id(movieToRemove.id, movieToRemove.language)
     except:
         raise HTTPException(status_code=503, detail="Id movie not found")
     response = requests.get("http://localhost:3001/profil/", params={"userId": token_payload.get("userId")})
@@ -465,7 +474,7 @@ def remove_movie(id: Annotated[int, Body(...)], title: Annotated[str, Body(...)]
         user = response.json()
 
         for movie in user["moviesSeen"]:
-            if movie.get("id") == id:
+            if movie.get("id") == movieToRemove.id:
                 response = requests.post("http://localhost:3001/profil/removeSeenMovie",
                                          json={"userId": token_payload.get("userId"),
                                                "movie": {"title": movie.get("title"), "id": movie.get("id")}})
