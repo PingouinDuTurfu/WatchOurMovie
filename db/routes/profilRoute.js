@@ -11,7 +11,6 @@ router.get('/', async (req, res) => {
         else
             res.status(404).json({ error: 'Profil not found' });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });
@@ -25,14 +24,13 @@ router.get('/fromUsername', async (req, res) => {
         else
             res.status(404).json({ error: 'Profil not found' });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });
 
 router.post('/firstConnection', async (req, res) => {
     try {
-        const { userId, username, name, lastname, age, language } = req.body;
+        const { userId, username, name, lastname, language } = req.body;
 
         const profils = await Profils.findOne({ userId: userId });
 
@@ -41,8 +39,6 @@ router.post('/firstConnection', async (req, res) => {
 
         const preferenceGenres = [];
         const groups = [];
-
-
 
         req.body.preferenceGenres.forEach(genre => {
             if(genre)
@@ -63,7 +59,6 @@ router.post('/firstConnection', async (req, res) => {
         await profil.save();
         res.status(201).json(profil);
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });
@@ -80,7 +75,6 @@ router.post('/addSeenMovie', async (req, res) => {
             res.status(404).json({ error: 'Profil not found' });
         }
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });
@@ -97,7 +91,6 @@ router.post('/removeSeenMovie', async (req, res) => {
             res.status(404).json({ error: 'Profil not found' });
         }
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });
@@ -114,18 +107,14 @@ router.post('/addPreferenceGenre', async (req, res) => {
             res.status(404).json({ error: 'Profil not found' });
         }
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });
 
-router.post('/updateProfile', async (req, res) => {
+router.post('/updateGenre', async (req, res) => {
     try {
-        const { userId, preferenceGenres, language } = req.body;
-        console.log(userId)
-        console.log(preferenceGenres)
-        console.log(language)
-        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $set: { preferenceGenres: preferenceGenres, language: language } }, { new: true });
+        const { userId, preferenceGenres} = req.body;
+        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $set: { preferenceGenres: preferenceGenres} }, { new: true });
 
         if(profils) {
             res.status(200).json(profils);
@@ -133,17 +122,30 @@ router.post('/updateProfile', async (req, res) => {
             res.status(404).json({ error: 'Profil not found' });
         }
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });
 
+
+router.post('/updateLanguage', async (req, res) => {
+    try {
+        const { userId, language } = req.body;
+        const profils = await Profils.findOneAndUpdate({ userId: userId }, { $set: {  language: language } }, { new: true });
+
+        if(profils) {
+            res.status(200).json(profils);
+        } else {
+            res.status(404).json({ error: 'Profil not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'An error occurred' });
+    }
+});
 router.get('/list', async (req, res) => {
     try {
         const profils = await Profils.find();
         res.status(200).json(profils);
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });

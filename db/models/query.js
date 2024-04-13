@@ -1,18 +1,12 @@
 const database = require('../database/database');
 
-const requestSchema = new database.Schema({
+const querySchema = new database.Schema({
     request: {
         include_adult: { type: Boolean },
         language: { type: String },
         page: { type: Number },
         region: { type: String },
-        sort_by: { type: String },
-        with_genres: { type: [Number] },
-        with_keywords: { type: [String] },
-        with_people: { type: [String] },
-        without_genres: { type: [Number] },
-        without_keywords: { type: [String] },
-        year: { type: Number }
+        query: { type: String, required: true },
     },
     response: [
         {
@@ -34,4 +28,4 @@ const requestSchema = new database.Schema({
     ]
 });
 
-module.exports = database.model('Request', requestSchema);
+module.exports = database.model('Query', querySchema);

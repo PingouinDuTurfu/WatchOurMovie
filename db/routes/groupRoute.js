@@ -11,7 +11,6 @@ router.get('/', async (req, res) => {
         else
             res.status(404).json({ error: 'Group not found' });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });
@@ -26,9 +25,8 @@ router.post('/create', async (req, res) => {
             return res.status(409).json({ error: 'Group already exists' });
 
         const profil = await Profils.findOneAndUpdate({ userId: userId }, { $push: { groups: { groupName: groupName }}}, { new: true });
-        res.status(200).json({ groupName: groupName });
+        res.status(200).json(profil);
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });
@@ -40,7 +38,6 @@ router.post('/leave', async (req, res) => {
         const profil = await Profils.findOneAndUpdate({ userId: userId }, { $pull: { groups: { groupName: groupName }}}, { new: true });
         res.status(200).json(profil);
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });
@@ -48,20 +45,28 @@ router.post('/leave', async (req, res) => {
 router.post('/join', async (req, res) => {
     try {
         const { userId, groupName } = req.body;
-        const profil = await Profils.findOneAndUpdate({ userId: userId }, { $push: { groups: { groupName: groupName }}}, { new: true });
+        const profil = await Profils.findOneAndUpdate({ userId: userId }, { $addToSet: { groups: { groupName: groupName }}}, { new: true });
         res.status(200).json(profil);
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });
 
 router.get('/list', async (req, res) => {
-        try {
-            const groups = await Profils.find().select('groups');
-            res.status(200).json(groups);
-        } catch (error) {
-        console.log(error);
+    try {
+        const groups = await Profils.find().select('groups -_id');
+        const distinctGroups = new Set();
+        groups.forEach(groupList => {
+            if(!groupList.groups)
+                return;
+
+            groupList.groups.forEach(group => {
+                if(group.groupName)
+                    distinctGroups.add(group.groupName);
+            })
+        });
+        res.status(200).json(Array.from(distinctGroups));
+    } catch (error) {
         res.status(500).json({error: 'An error occurred'});
     }
 });
