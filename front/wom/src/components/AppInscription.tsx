@@ -64,7 +64,7 @@ export default function AppInscription() {
 
   async function fetchGenres() {
     try {
-      const genres = await GenresService.retireveGenres();
+      const genres = await GenresService.retrieveGenres();
       setGenres(genres);
       setGenresToDisplay(genres);
     } catch (error) {

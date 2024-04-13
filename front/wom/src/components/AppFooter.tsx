@@ -27,13 +27,15 @@ export default function AppFooter({footerNavValue, setFooterNavValue}: AppFooter
         to="/"
         className={footerNavValue === 0 ? styles.activeIcon : ""}
       />
-      <BottomNavigationAction
-        label="Films"
-        icon={<Movie />}
-        component={Link}
-        to="/films"
-        className={footerNavValue === 1 ? styles.activeIcon : ""}
-      />
+      {authToken && (
+        <BottomNavigationAction
+          label="Films"
+          icon={<Movie />}
+          component={Link}
+          to="/films"
+          className={footerNavValue === 1 ? styles.activeIcon : ""}
+        />
+      )}
       {authToken && (
         <BottomNavigationAction
           label="Groupes"

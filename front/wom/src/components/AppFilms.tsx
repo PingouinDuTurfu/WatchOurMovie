@@ -15,7 +15,7 @@ export default function AppFilms() {
   const [films, setFilms] = useState<Film[]>([]);
   const [searchValue, setSearchValue] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const filmsPerPage: number = 12;
+  const filmsPerPage: number = 20;
 
   useEffect(() => {
     getMovies();
@@ -30,10 +30,10 @@ export default function AppFilms() {
     }
   }
 
-  const handleSearchEntry = (searchEntry: string) => {
+  function handleSearchEntry(searchEntry: string) {
     setSearchValue(searchEntry);
     setCurrentPage(1); 
-  };
+  }
 
   //calcule le debut et la fin pour la pagination
   const startIndex: number = (currentPage - 1) * filmsPerPage;

@@ -5,22 +5,8 @@ import styles from "../css/AppProfil.module.css";
 import { useAuth } from '../auth/AuthProvider';
 import ApiUtils from '../utils/ApiUtils';
 import { Genre } from '../types/genreType';
-import { Group } from '../types/groupType';
 import GenresService from '../services/GenresService';
-import { Film } from '../types/genreFilm';
-
-interface UserProfile {
-  _id: string;
-  userId: string;
-  username: string;
-  name: string;
-  lastname: string;
-  language: string;
-  moviesSeen: Film[]; 
-  preferenceGenres: { name: string; id: number; _id: string }[];
-  groups: Group[];
-  __v: number;
-}
+import { UserProfile } from '../types/profileType';
 
 export default function AppProfil() {
   const [addingGenre, setAddingGenre] = useState(false);
@@ -49,10 +35,8 @@ export default function AppProfil() {
   }
 
   function handleClickWatchedMovies() {
-    if (userProfile) {
+    if (userProfile?.moviesSeen) {
       setShowingMovies(true);
-    } else {
-      console.log("Aucun film vu");
     }
   }
 
@@ -63,9 +47,10 @@ export default function AppProfil() {
           ...userProfile,
           preferenceGenres: [...userProfile.preferenceGenres, selectedGenre]
         };
-        // setUserProfile(updatedProfile);
+        setUserProfile(updatedProfile);
         setSelectedGenre(null);
         setAddingGenre(false);
+        editGenres(userProfile.preferenceGenres);
       }
     }
   }
@@ -88,7 +73,7 @@ export default function AppProfil() {
 
   async function fetchGenres() {
     try {
-      const genres = await GenresService.retireveGenres();
+      const genres = await GenresService.retrieveGenres();
       setGenres(genres);
     } catch (error) {
       console.log('Erreur lors de la récupération des genres');
@@ -101,6 +86,10 @@ export default function AppProfil() {
         <CircularProgress />
       </div>
     );
+  }
+
+  async function editGenres(Genres: Genre[]) {
+    // post genres
   }
 
   return (

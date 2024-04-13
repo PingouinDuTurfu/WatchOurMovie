@@ -37,11 +37,11 @@ export default function AppMenu({ setFooterNavValue }: AppMenuProps) {
         <Button color="inherit" component={Link} to="/" onClick={() => handleNavClick(0)}>
           Accueil
         </Button>
-        <Button color="inherit" component={Link} to="/films" onClick={() => handleNavClick(1)}>
-          Films
-        </Button>
         {authToken && (
           <>
+            <Button color="inherit" component={Link} to="/films" onClick={() => handleNavClick(1)}>
+              Films
+            </Button>
             <Button color="inherit" component={Link} to="/groupes" onClick={() => handleNavClick(2)}>
               Groupes
             </Button>

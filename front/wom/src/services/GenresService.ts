@@ -2,7 +2,7 @@ import ApiUtils from '../utils/ApiUtils';
 import { Genre } from '../types/genreType';
 
 class GenresService {
-  async retireveGenres(): Promise<Genre[]> {
+  async retrieveGenres(): Promise<Genre[]> {
     try {
       const response = await ApiUtils.getApiInstanceJson().get('/genres');
       return response.data;

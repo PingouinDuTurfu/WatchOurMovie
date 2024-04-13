@@ -1,36 +1,78 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Paper, TextField, Button, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import styles from '../css/AppGroupes.module.css';
-
-const allGroups = [
-  { id: 1, name: 'Groupe 1' },
-  { id: 2, name: 'Groupe 2' },
-  { id: 3, name: 'Groupe 3' },
-  { id: 4, name: 'Groupe 4' },
-  { id: 5, name: 'Groupe 5' },
-  { id: 6, name: 'Groupe 6' },
-  { id: 7, name: 'Groupe 7' },
-  { id: 8, name: 'Groupe 8' },
-  { id: 9, name: 'Groupe 9' },
-  { id: 10, name: 'Groupe 10' },
-];
-
-const userGroups = [
-  { id: 1, name: 'Groupe 1' },
-  { id: 6, name: 'Groupe 6' },
-];
+import { useAuth } from '../auth/AuthProvider';
+import GroupsService from '../services/GroupsService'; // Importer le service
+import { Group } from '../types/groupType';
+import ApiUtils from '../utils/ApiUtils';
+import { UserProfile } from '../types/profileType';
 
 export default function AppGroupes() {
   const [searchValue, setSearchValue] = useState('');
+  const [newGroupName, setNewGroupName] = useState('');
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const { authToken, userId } = useAuth();
 
-  const filteredGroups = allGroups.filter(group =>
-    group.name.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const groups = await GroupsService.retrieveGroups();
+        setGroups(groups);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des groupes :', error);
+      }
+    };
+    fetchUserProfile();
+    fetchGroups();
+  }, []);
+
+  const filteredGroups = Array.isArray(groups) ? groups.filter(group =>
+    group.groupName.toLowerCase().includes(searchValue.toLowerCase())
+  ) : [];  
+
+  async function handleCreateGroup() {
+    try {
+      await ApiUtils.getApiInstanceJson().post('/group/create', { groupName: newGroupName }, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      setNewGroupName('');
+    } catch (error) {
+      console.error('Erreur lors de la création du groupe :', error);
+    }
+  };
+
+  async function fetchUserProfile() {
+    try {
+      if (userId && authToken) {
+        const response = await ApiUtils.getApiInstanceJson().get<UserProfile>(`/profil/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        setUserProfile(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+    }
+  }
 
   return (
     <div className={styles.container}>
       <Paper className={styles.paperContainer}>
+        <div className={styles.createGroupContainer}>
+          <TextField
+            label="Nom du groupe"
+            variant="outlined"
+            fullWidth
+            value={newGroupName}
+            onChange={(e) => setNewGroupName(e.target.value)}
+          />
+          <Button onClick={handleCreateGroup} variant="contained" color="primary">Créer un groupe</Button>
+        </div>
         <Typography variant="h6">Tous les groupes</Typography>
         <div className={styles.searchContainer}>
           <TextField
@@ -42,8 +84,8 @@ export default function AppGroupes() {
           />
         </div>
         {filteredGroups.map(group => (
-          <Paper key={group.id} className={styles.groupContainer}>
-            <Typography>{group.name}</Typography>
+          <Paper className={styles.groupContainer}>
+            <Typography>{group.groupName}</Typography>
             <Button variant="outlined">Rejoindre</Button>
           </Paper>
         ))}
@@ -51,10 +93,10 @@ export default function AppGroupes() {
 
       <Paper className={styles.paperContainer}>
         <Typography variant="h6">Vos groupes</Typography>
-        {userGroups.map(group => (
-          <Paper key={group.id} className={styles.groupContainer}>
-            <Typography>{group.name}</Typography>
-            <Button component={Link} to={`/groupes/${group.id}`} variant="outlined">Recommandation</Button>
+        {userProfile?.groups.map(group => (
+          <Paper className={styles.groupContainer}>
+            <Typography>{group.groupName}</Typography>
+            <Button component={Link} to={`/groupes/${group.groupName}`} variant="outlined">Recommandation</Button>
           </Paper>
         ))}
       </Paper>

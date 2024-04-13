@@ -17,16 +17,16 @@ const AppRouter = () => {
   return (
     <Routes>
       <Route path="/" element={<AppHome />} />
-      <Route path="/films" element={<AppFilms />} />
       <Route path="/connexion" element={<AppConnexion />} />
       <Route path="/inscription" element={<AppInscription />} />
       <Route path="/cgu" element={<AppCGU />} />
       <Route path="/contacts" element={<AppContacts />} />
-      <Route path="/films/:filmId" element={<AppFilmDetails />} />
       <Route path="*" element={<AppError404 />} />
       <Route element={<AppRoutesPrivate />}>
+        <Route path="/films" element={<AppFilms />} />
+        <Route path="/films/:filmId" element={<AppFilmDetails />} />
         <Route path="/groupes" element={<AppGroupes />} />
-        <Route path="/groupes/:groupeId" element={<AppGroupeDetails />} />
+        <Route path="/groupes/:groupName" element={<AppGroupeDetails />} />
         <Route path="/profil" element={<AppProfil />} />
         <Route path="/recommandations" element={<AppRecommandations />} />
       </Route>
