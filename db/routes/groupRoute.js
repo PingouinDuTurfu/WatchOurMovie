@@ -11,7 +11,6 @@ router.get('/', async (req, res) => {
         else
             res.status(404).json({ error: 'Group not found' });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });
@@ -28,7 +27,6 @@ router.post('/create', async (req, res) => {
         const profil = await Profils.findOneAndUpdate({ userId: userId }, { $push: { groups: { groupName: groupName }}}, { new: true });
         res.status(200).json(profil);
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });
@@ -40,7 +38,6 @@ router.post('/leave', async (req, res) => {
         const profil = await Profils.findOneAndUpdate({ userId: userId }, { $pull: { groups: { groupName: groupName }}}, { new: true });
         res.status(200).json(profil);
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });
@@ -51,7 +48,6 @@ router.post('/join', async (req, res) => {
         const profil = await Profils.findOneAndUpdate({ userId: userId }, { $addToSet: { groups: { groupName: groupName }}}, { new: true });
         res.status(200).json(profil);
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'An error occurred' });
     }
 });
@@ -71,7 +67,6 @@ router.get('/list', async (req, res) => {
         });
         res.status(200).json(Array.from(distinctGroups));
     } catch (error) {
-        console.log(error);
         res.status(500).json({error: 'An error occurred'});
     }
 });

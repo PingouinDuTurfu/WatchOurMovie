@@ -8,9 +8,7 @@ const Recommendations = require('../models/recommendation');
 router.post('/', async (req, res) => {
     try {
         const { id, language } = req.body;
-        console.log(id, language)
         const movie = await Movies.findOne({ id: id, language: language });
-        console.log(movie)
 
         if(movie) {
             res.status(200).json(movie);
@@ -25,10 +23,8 @@ router.post('/', async (req, res) => {
         })
             .then(response => response.json())
             .then(async data => {
-                console.log(data);
                 data["genre_ids"]= data["genres"].map(genre => genre.id);
                 data["language"]=language;
-                console.log(data);
                 const movie = new Movies(data);
                 await movie.save();
                 res.status(201).json(movie);
@@ -91,17 +87,12 @@ router.post('/discover', async (req, res) => {
                     movie["language"] = language;
                     return new Movies(movie);
                 });
-                
-                try {
-                    await request.save();
-                } catch (error) {
-                    console.log(error);
-                }
+
+                await request.save();
 
                 try {
                     await Movies.insertMany(movies);
                 } catch (error) {
-                    console.log("yup")
                     if(error.code !== 11000)
                         throw error;
                 }
@@ -109,7 +100,6 @@ router.post('/discover', async (req, res) => {
                 res.status(201).json(request.response);
             });
     } catch (error) {
-        console.log(error)
         res.status(500).json({ error: 'An error occurred' });
     }
 });
@@ -161,12 +151,7 @@ router.post('/search', async (req, res) => {
                     return new Movies(movie);
                 });
 
-
-                try {
-                    await query1.save();
-                } catch (error) {
-                    console.log(error);
-                }
+                await query1.save();
 
                 try {
                     await Movies.insertMany(movies);
@@ -178,7 +163,6 @@ router.post('/search', async (req, res) => {
                 res.status(201).json(query1.response);
             });
     } catch (error) {
-        console.log(error   )
         res.status(500).json({ error: 'An error occurred' });
     }
 });
@@ -229,11 +213,8 @@ router.post('/recommendation', async (req, res) => {
                 });
 
 
-                try {
-                    await request.save();
-                } catch (error) {
-                    console.log(error);
-                }
+
+                await request.save();
 
                 try {
                     await Movies.insertMany(movies);
