@@ -9,13 +9,15 @@ const profilSchema = new database.Schema({
     moviesSeen: [
         {
             name: {type: String, required: true},
-            id: {type: Number, required: true}
+            id: {type: Number, required: true},
+            _id: false
         }
     ],
     preferenceGenres: [
         {
             name: {type: String, required: true},
-            id: {type: Number, required: true}
+            id: {type: Number, required: true},
+            _id: false
         }
     ],
     groups: [
