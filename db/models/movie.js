@@ -3,7 +3,7 @@ const database = require('../database/database');
 const movieSchema = new database.Schema({
     adult: { type: Boolean },
     genre_ids: { type: [Number] },
-    id: { type: Number, unique: true, required: true },
+    id: { type: Number, required: true },
     original_language: { type: String },
     original_title: { type: String },
     overview: { type: String },
@@ -13,7 +13,8 @@ const movieSchema = new database.Schema({
     title: { type: String },
     video: { type: Boolean },
     vote_average: { type: Number },
-    vote_count: { type: Number }
+    vote_count: { type: Number },
+    language: { type: String }
 }, { collection: 'movies' });
 
 module.exports = database.model('Movie' , movieSchema);

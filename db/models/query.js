@@ -22,7 +22,8 @@ const querySchema = new database.Schema({
             title: { type: String },
             video: { type: Boolean },
             vote_average: { type: Number },
-            vote_count: { type: Number }
+            vote_count: { type: Number },
+            language: { type: String }
         }
     ]
 });
