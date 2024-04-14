@@ -1,5 +1,6 @@
 import { Typography } from "@mui/material";
 import styles from "../css/AppCGU.module.css"
+import { Link } from "react-router-dom";
 
 export default function AppCGU() {
   return (
@@ -24,9 +25,9 @@ export default function AppCGU() {
       </Typography>
       <Typography variant="body1">
         3. L'utilisation des données des films est soumise aux conditions de {" "}
-        <a href="https://www.themoviedb.org/terms-of-use" target="/">
+        <Link to="https://www.themoviedb.org/terms-of-use" target="/">
           TheMovieDataBase
-        </a>
+        </Link>
         , merci de vous y référer pout toute information supplémentaire.
       </Typography>
       <Typography variant="h6">

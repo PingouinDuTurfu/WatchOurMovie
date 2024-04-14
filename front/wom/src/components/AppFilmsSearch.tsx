@@ -21,8 +21,6 @@ export default function AppFilmsSearch() {
 
   useEffect(() => {
     getSearchMovies(1);
-    console.log(searchValue);
-    
   }, []);
 
   async function getSearchMovies(moviePage: number) {

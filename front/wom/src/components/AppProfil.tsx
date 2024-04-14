@@ -38,8 +38,6 @@ export default function AppProfil() {
   useEffect(() => {
     fetchGenres();
     fetchLanguages();
-    console.log(authToken);
-    console.log(userId);
   }, []);
 
   function handleGenreSelect(event: React.ChangeEvent<HTMLInputElement>) {
