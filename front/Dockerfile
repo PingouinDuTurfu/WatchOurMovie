@@ -2,7 +2,7 @@ FROM node:latest
 
 WORKDIR /front
 
-COPY ./front/wom/package*.json ./
+COPY ./front/wom/package.json ./
 
 RUN npm install
 
