@@ -38,9 +38,11 @@ def transform_to_user(user_data):
 
 async def get_token_auth_header(authorization: str = Header(...)):
     if authorization is None:
+        save_log("Authorization header is missing : status_code=401")
         raise HTTPException(status_code=401, detail="Authorization header is missing")
     parts = authorization.split()
     if len(parts) != 2 or parts[0].lower() != "bearer":
+        save_log("Invalid authorization header : status_code=401")
         raise HTTPException(status_code=401, detail="Invalid authorization header")
     return parts[1]
 
@@ -49,8 +51,10 @@ def verify_token(token: str = Depends(get_token_auth_header)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
     except jwt.ExpiredSignatureError:
+        save_log("Token has expired : status_code=401")
         raise HTTPException(status_code=401, detail="Token has expired")
     except jwt.InvalidTokenError:
+        save_log("Invalid token : status_code=401")
         raise HTTPException(status_code=401, detail="Invalid token")
     return payload
 
