@@ -28,7 +28,7 @@ export default function AppContacts() {
 
         <div className={styles.contact}>
           <GitHub className={styles.icon} />
-          <a href="https://github.com/PingouinDuTurfu/WatchOurMovie" target="/">GitHub (Need rights)</a>
+          <a href="https://github.com/PingouinDuTurfu/WatchOurMovie" target="/">GitHub</a>
         </div>
         <div className={styles.contact}>
           <LocationOn className={styles.icon} />
