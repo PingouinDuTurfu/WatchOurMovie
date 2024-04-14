@@ -6,6 +6,7 @@ from api.vars import API_PORT, AUTH_PORT, DB_PORT, LOG_PORT, SECRET_KEY
 
 if not AUTH_PORT or not DB_PORT or not LOG_PORT or not API_PORT or not SECRET_KEY:
     raise ValueError("Missing environment variables")
+
 app = FastAPI()
 app.include_router(auth.router)
 app.include_router(group.router)
