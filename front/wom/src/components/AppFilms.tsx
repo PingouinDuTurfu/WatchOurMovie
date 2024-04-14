@@ -1,20 +1,15 @@
 import { useState, useEffect } from "react";
 import styles from "../css/AppFilms.module.css";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, CircularProgress, IconButton, InputBase, TextField } from "@mui/material";
+import { Button, CircularProgress, IconButton, TextField } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import ApiUtils from "../utils/ApiUtils";
-
-interface Film {
-  id: number;
-  title: string;
-  image: string;
-}
+import FilmsService from "../services/FilmsService";
+import { FilmDetails } from "../types/filmDetailsType";
 
 export default function AppFilms() {
-  const [films, setFilms] = useState<Film[]>([]);
+  const [films, setFilms] = useState<FilmDetails[]>([]);
   const [searchValue, setSearchValue] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const navigate = useNavigate();
@@ -26,10 +21,8 @@ export default function AppFilms() {
   async function getMovies(moviePage: number) {
     try {
       const language = localStorage.getItem("language") || "fr";
-      const response = await ApiUtils.getApiInstanceJson().get(
-        `/movies/${moviePage}?language=${language}`
-      );
-      setFilms(response.data);
+      const response = await FilmsService.getMovies(moviePage, language);
+      setFilms(response);
     } catch (error) {
       console.error("Erreur lors de la récupération des films :", error);
     }

@@ -1,4 +1,4 @@
-import { Button, List, ListItem, ListItemText, Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import ApiUtils from '../utils/ApiUtils';
 import { useAuth } from '../auth/AuthProvider';

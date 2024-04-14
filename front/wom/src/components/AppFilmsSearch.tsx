@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import styles from "../css/AppFilms.module.css";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { Button, CircularProgress, IconButton, InputBase } from "@mui/material";
-import { Search } from "@mui/icons-material";
+import { Button, CircularProgress } from "@mui/material";
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import FilmsService from "../services/FilmsService";

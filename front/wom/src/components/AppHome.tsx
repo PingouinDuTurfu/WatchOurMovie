@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Button, Paper, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
-import MovieQuoteApi from './AppTestQuotesApi';
 import { UserProfile } from '../types/profileType';
 import { useAuth } from '../auth/AuthProvider';
-import ProfileService from '../services/ProfileService';
-import ApiUtils from '../utils/ApiUtils';
-import styles from "../css/AppHome.module.css";
 import { FilmDetails } from '../types/filmDetailsType';
+import AppTestQuotesApi from './AppTestQuotesApi';
+import ProfileService from '../services/ProfileService';
+import styles from "../css/AppHome.module.css";
+import FilmsService from '../services/FilmsService';
 
 export default function AppHome() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -28,10 +28,8 @@ export default function AppHome() {
   async function getMovies() {
     try {
       const language = localStorage.getItem("language") || "fr";
-      const response = await ApiUtils.getApiInstanceJson().get(
-        `/movies/1?language=${language}`
-      );
-      setFilms(response.data);
+      const response = await FilmsService.getMovies(1, language);
+      setFilms(response);
     } catch (error) {
       console.error("Erreur lors de la récupération des films :", error);
     }
@@ -65,7 +63,7 @@ export default function AppHome() {
           ))}
       </div>
   
-      <MovieQuoteApi />
+      <AppTestQuotesApi />
     </div>
   );
 }  
