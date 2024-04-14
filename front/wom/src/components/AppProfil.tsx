@@ -27,7 +27,7 @@ export default function AppProfil() {
 
   useEffect(() => {
     fetchUserProfile();
-  }, [userId, authToken]);  
+  });  
   
   useEffect(() => {
     if (userProfile?.language) {
@@ -36,8 +36,8 @@ export default function AppProfil() {
   }, [userProfile]);
 
   useEffect(() => {
-    fetchGenres();
     fetchLanguages();
+    fetchGenres();
   }, []);
 
   function handleGenreSelect(event: React.ChangeEvent<HTMLInputElement>) {
@@ -92,8 +92,8 @@ export default function AppProfil() {
   
   async function fetchUserProfile() {
     if (userId === null || authToken === null) return;
-    const userProfile = await ProfileService.fetchUserProfile(userId, authToken);
-    setUserProfile(userProfile);
+    const newUserProfile = await ProfileService.fetchUserProfile(userId, authToken);
+    setUserProfile(newUserProfile);
   }
 
   async function fetchGenres() {
@@ -178,7 +178,7 @@ export default function AppProfil() {
                 className={styles.languageSelect}
                 id="select-genre"
                 select
-                label="Genre"
+                label="Langue"
                 value={selectedLanguage ? selectedLanguage.english_name : ''}
                 onChange={handleLanguageSelect}
               >
@@ -188,7 +188,7 @@ export default function AppProfil() {
                   </MenuItem>
                 ))}
               </TextField>
-              <Button onClick={handleEditLanguage} variant="contained">Modifier</Button>
+              <Button className={styles.muiButtons} onClick={handleEditLanguage} variant="contained">Modifier</Button>
             </>
           ) : (
             <Button onClick={() => setEditLanguage(true)}>
@@ -204,7 +204,7 @@ export default function AppProfil() {
           {userProfile.groups.map((group, index) => (
             <ListItem key={index}>
               <ListItemText primary={group.groupName} />
-              <Button component={Link} to={`/groupes/${group.groupName}`} variant="outlined">Recommandation</Button>
+              <Button className={styles.muiButtons} component={Link} to={`/groupes/${group.groupName}`} variant="outlined">Recommandation</Button>
             </ListItem>
           ))}
         </List>

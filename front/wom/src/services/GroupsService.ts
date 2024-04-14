@@ -32,4 +32,5 @@ class GroupsService {
   }
 }
 
-export default new GroupsService();
+const groupsService = new GroupsService();
+export default groupsService;

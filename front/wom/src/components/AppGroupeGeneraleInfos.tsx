@@ -1,5 +1,5 @@
 import { Button, Typography } from "@mui/material";
-import { useParams, useNavigate, Link, Navigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
 import GroupsService from "../services/GroupsService";
 import { useEffect, useState } from "react";

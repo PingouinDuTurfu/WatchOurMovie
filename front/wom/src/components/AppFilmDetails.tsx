@@ -50,7 +50,7 @@ export default function AppFilmDetails() {
 
   useEffect(() => {
     fetchUserProfile();
-  }, [userId, authToken]);
+  }, []);
 
   useEffect(() => {
     if (userProfile && filmDetails) {

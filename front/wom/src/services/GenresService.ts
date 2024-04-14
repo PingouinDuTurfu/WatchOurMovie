@@ -12,4 +12,5 @@ class GenresService {
   }
 }
 
-export default new GenresService();
+const genresServices = new GenresService();
+export default genresServices;

@@ -1,4 +1,4 @@
-import { AppBar, Button, IconButton, TextField, Toolbar, Typography } from '@mui/material'
+import { AppBar, Button, Toolbar, Typography } from '@mui/material'
 import styles from "../css/AppMenu.module.css";
 import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';

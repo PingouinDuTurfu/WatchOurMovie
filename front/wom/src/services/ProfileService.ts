@@ -17,4 +17,5 @@ class UserService {
   }
 }
 
-export default new UserService();
+const profileService = new UserService();
+export default profileService;

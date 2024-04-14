@@ -36,3 +36,11 @@
   margin: 0.5em;
   width: 200px;
 }
+
+.muiButtons, .languageSelect  {
+  margin-left: 1em !important;
+}
+
+.languageSelect {
+  min-width: 120px !important;
+}
