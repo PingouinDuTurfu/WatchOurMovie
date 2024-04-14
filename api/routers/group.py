@@ -58,7 +58,7 @@ def get_group_by_id(groupName: str):
 
 @router.post("/group/join")
 def join_group(group: Group, token_payload: dict = Depends(verify_token)):
-    if len(group.groupName) != "":
+    if len(group.groupName) == 0:
         save_log("POST Create Group {groupName: " + group.groupName + "} : status_code=409",
                  token_payload.get("userId"))
         raise HTTPException(status_code=406, detail="GroupName empty")
@@ -192,7 +192,7 @@ def recommendation_without_movie(language: str, movies_seen: set, recommended_mo
 
 @router.post("/group/create")
 def create_group(group: Group, token_payload: dict = Depends(verify_token)):
-    if len(group.groupName) != "":
+    if len(group.groupName) == 0:
         save_log("POST Create Group {groupName: " + group.groupName + "} : status_code=409",
                  token_payload.get("userId"))
         raise HTTPException(status_code=406, detail="GroupName empty")
