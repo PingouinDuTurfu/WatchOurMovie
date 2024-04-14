@@ -1,11 +1,12 @@
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.10
 
-WORKDIR /app
+CMD ["mkdir", "/app/api"]
 
-COPY ./api/requirements.txt /app/requirements.txt
+WORKDIR /app/api
+
+COPY ./api/ /app/api
 
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-COPY ./api/ /app
 
 CMD ["python", "main.py"]
