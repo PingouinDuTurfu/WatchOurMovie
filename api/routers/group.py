@@ -58,6 +58,10 @@ def get_group_by_id(groupName: str):
 
 @router.post("/group/join")
 def join_group(group: Group, token_payload: dict = Depends(verify_token)):
+    if len(group.groupName) != "":
+        save_log("POST Create Group {groupName: " + group.groupName + "} : status_code=409",
+                 token_payload.get("userId"))
+        raise HTTPException(status_code=406, detail="GroupName empty")
     response = requests.post(DB_URL + "/group/join",
                              json={"userId": token_payload.get("userId"), "groupName": group.groupName})
     if response.status_code == 200:
@@ -158,7 +162,6 @@ def recommendation_with_movie(most_seen_movies: list, language: str, movies_seen
     for movie_id, _ in most_seen_movies:
         response = requests.post(DB_URL + "/movie/recommendation/",
                                  json={"movie_id": movie_id, "language": language, "page": 1})
-        print(response.json())
         if response.status_code == 200 or response.status_code == 201:
             data = response.json()
             for movie in data:
@@ -189,6 +192,10 @@ def recommendation_without_movie(language: str, movies_seen: set, recommended_mo
 
 @router.post("/group/create")
 def create_group(group: Group, token_payload: dict = Depends(verify_token)):
+    if len(group.groupName) != "":
+        save_log("POST Create Group {groupName: " + group.groupName + "} : status_code=409",
+                 token_payload.get("userId"))
+        raise HTTPException(status_code=406, detail="GroupName empty")
     response = requests.post(DB_URL + "/group/create",
                              json={"userId": token_payload.get("userId"), "groupName": group.groupName})
     if response.status_code == 200:
