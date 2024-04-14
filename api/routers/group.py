@@ -86,12 +86,17 @@ def leave_group(group: Group, token_payload: dict = Depends(verify_token)):
 def get_group_recommendation(language: str, groupName: str, onMoviesSeen: bool,
                              token_payload: dict = Depends(verify_token)):
     if not (verify_lang(language)):
-        save_log("GET Group {groupName: " + groupName + ", onMoviesSeen: " + str(
+        save_log("GET Recommendation {groupName: " + groupName + ", onMoviesSeen: " + str(
             onMoviesSeen) + ", language: " + language + "} : status_code=404", token_payload.get("userId"))
         raise HTTPException(status_code=404, detail="Language not found")
     response = requests.get(DB_URL + "/group/", params={"groupName": groupName})
     if response.status_code == 200:
         members = response.json()
+        if not (any(member['userId'] == token_payload.get("userId") for member in members)):
+            save_log("GET Recommendation {groupName: " + groupName + ", onMoviesSeen: " + str(
+                onMoviesSeen) + ", language: " + language + "} : status_code=401", token_payload.get("userId"))
+            raise HTTPException(status_code=401, detail="Not a member")
+
         movies_seen_counter = collections.defaultdict(int)
         genres_counter = collections.defaultdict(int)
         movies_seen = set()
@@ -115,7 +120,7 @@ def get_group_recommendation(language: str, groupName: str, onMoviesSeen: bool,
         recommendations = []
         recommended_movie_ids = set()
 
-        if movies_seen and not onMoviesSeen:
+        if movies_seen and onMoviesSeen:
             recommendations, recommended_movie_ids = recommendation_with_movie(most_seen_movies, language, movies_seen,
                                                                                recommended_movie_ids, recommendations,
                                                                                most_common_genre_ids)
@@ -131,15 +136,16 @@ def get_group_recommendation(language: str, groupName: str, onMoviesSeen: bool,
         genre = {genre["id"]: genre["name"] for genre in genres}
         for reco in sorted_recommendations:
             result_reco.append(transform_to_movie(reco, genre))
-        save_log("GET Group {groupName: " + groupName + ", onMoviesSeen: " + str(
+        save_log("GET Recommendation {groupName: " + groupName + ", onMoviesSeen: " + str(
             onMoviesSeen) + ", language: " + language + "} : status_code=200", token_payload.get("userId"))
-        return result_reco
+        return result_reco[:10]
+
     elif response.status_code == 404:
-        save_log("GET Group {groupName: " + groupName + ", onMoviesSeen: " + str(
+        save_log("GET Recommendation {groupName: " + groupName + ", onMoviesSeen: " + str(
             onMoviesSeen) + ", language: " + language + "} : status_code=404", token_payload.get("userId"))
         raise HTTPException(status_code=404, detail="Group not found")
     else:
-        save_log("GET Group {groupName: " + groupName + ", onMoviesSeen: " + str(
+        save_log("GET Recommendation {groupName: " + groupName + ", onMoviesSeen: " + str(
             onMoviesSeen) + ", language: " + language + "} : status_code=500", token_payload.get("userId"))
         raise HTTPException(status_code=500, detail="An error occurred")
 
@@ -151,7 +157,8 @@ def recommendation_with_movie(most_seen_movies: list, language: str, movies_seen
         raise HTTPException(status_code=404, detail="Language not found")
     for movie_id, _ in most_seen_movies:
         response = requests.post(DB_URL + "/movie/recommendation/",
-                                 json={"movieId": movie_id, "language": language})
+                                 json={"movie_id": movie_id, "language": language, "page": 1})
+        print(response.json())
         if response.status_code == 200 or response.status_code == 201:
             data = response.json()
             for movie in data:
