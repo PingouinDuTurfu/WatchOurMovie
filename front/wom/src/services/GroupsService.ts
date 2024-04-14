@@ -1,17 +1,15 @@
 import ApiUtils from '../utils/ApiUtils';
-import { Group } from '../types/groupType';
 
 class GroupsService {
-  async retrieveGroups(): Promise<Group[]> {
+  
+  async retrieveGroups(): Promise<string[]> {
     try {
       const response = await ApiUtils.getApiInstanceJson().get('/groups');
-      const groupNames = Object.keys(response.data);
-      const groups: Group[] = groupNames.map((groupName) => ({
-        groupName,
-      }));
-      return groups;
+      console.log(response.data);
+      return response.data;
+      
     } catch (error) {
-      throw new Error('Erreur lors de la récupération des groupes');
+      throw new Error('Erreur lors de la récupération des genres');
     }
   }
 

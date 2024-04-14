@@ -22,3 +22,7 @@
 .searchContainer {
   margin-bottom: 20px;
 }
+
+.input {
+  margin: 1em 0 1em 0 !important; 
+}

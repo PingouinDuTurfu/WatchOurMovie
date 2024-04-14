@@ -23,40 +23,33 @@
     text-decoration: none;
 }
 
+.filmImage {
+    width: 100%;
+}
+
 .filmImage:hover {
     transform: scale(1.05);
     transition: transform 0.4s ease;
 }
 
-
 .pagination {
     margin-top: 20px;
     text-align: center;
+    vertical-align: center;
 }
 
-.pageSquare {
-    padding: 1em;
-    margin: 0 5px;
-    border: none;
-    border-radius: 4px;
-    display: inline-block;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.pageSquare:hover {
-    background-color: rgb(200, 200, 240);
+.pageArrow:hover {
+    background-color: rgb(200, 200, 240) !important;
 }
 
 .activePage {
-    padding: 1em;
+    padding: 0.5em 1em 0.5em 1em;
     margin: 0 5px;
     border: none;
     border-radius: 4px;
-    background-color: rgb(78, 76, 166);
+    background-color: rgb(105, 105, 210);
     color: rgb(255, 255, 255);
     display: inline-block;
-    cursor: pointer;
 }
 
 .searchInput {

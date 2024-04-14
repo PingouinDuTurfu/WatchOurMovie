@@ -7,6 +7,7 @@ import { Genre } from '../types/genreType';
 import GenresService from '../services/GenresService';
 import { UserProfile } from '../types/profileType';
 import ProfileService from '../services/ProfileService';
+import ApiUtils from '../utils/ApiUtils';
 
 export default function AppProfil() {
   const [addingGenre, setAddingGenre] = useState(false);
@@ -18,7 +19,13 @@ export default function AppProfil() {
 
   useEffect(() => {
     fetchUserProfile();
-  }, [userId, authToken]);
+  }, [userId, authToken]);  
+  
+  useEffect(() => {
+    if (userProfile?.language) {
+      localStorage.setItem("language", userProfile?.language);
+    }
+  }, [userProfile]);
 
   useEffect(() => {
     fetchGenres();
@@ -50,7 +57,7 @@ export default function AppProfil() {
         setUserProfile(updatedProfile);
         setSelectedGenre(null);
         setAddingGenre(false);
-        editGenres(userProfile.preferenceGenres);
+        editGenres(updatedProfile.preferenceGenres);
       }
     }
   }
@@ -78,8 +85,14 @@ export default function AppProfil() {
     );
   }
 
-  async function editGenres(genres: Genre[]) {
-    // post genres
+  async function editGenres(newGenres: Genre[]) {
+    try {
+      if (userProfile?.preferenceGenres && authToken) {
+        await ApiUtils.getApiInstanceJson(authToken).post('/updateGenre', { preferenceGenres: newGenres });
+      }
+    } catch (error) {
+      throw new Error('Erreur lors de la récupération des genres');
+    }
   }
 
   async function editLanguage(languageShort: string[]) {

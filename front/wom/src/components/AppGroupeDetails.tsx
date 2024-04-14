@@ -20,11 +20,31 @@ export default function AppGroupeDetails() {
     }
   }
 
+  async function handleRecommandation() {
+    try {
+      if (groupName && authToken) {
+        const language = localStorage.getItem("language") || "fr";
+        const response = await ApiUtils.getApiInstanceJson(authToken).get(
+          '/group/recommendation', {
+            params: {
+              language: language,
+              groupName: groupName,
+              onMoviesSeen: false
+            }
+        });
+        console.log(response);
+        
+      }
+    } catch (error) {
+      console.error('Erreur lors de la sortie du groupe :', error);
+    }
+  }
+
   return (
     <div>
       <h2>Groupe Name : {groupName}</h2>
       <p>Faire une requête à l'API pour avoir les infos concernant le groupe</p>
-      <Button variant='contained'>Recommandation</Button>
+      <Button variant='contained' onClick={handleRecommandation}>Recommandation</Button>
       <Button variant='contained' onClick={handleLeaveGroup}>Quitter le groupe</Button>
     </div>
   );

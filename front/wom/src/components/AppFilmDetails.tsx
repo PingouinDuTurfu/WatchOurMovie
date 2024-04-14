@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import ApiUtils from '../utils/ApiUtils';
 import { Button, CircularProgress } from '@mui/material';
@@ -22,11 +22,16 @@ export default function AppFilmDetails() {
   const [filmDetails, setFilmDetails] = useState<FilmDetails | null>(null);
   const [loading, setLoading] = useState(false);
   const { authToken } = useAuth();
+  const language = localStorage.getItem("language") || "fr";
 
   useEffect(() => {
     const fetchFilmDetails = async () => {
       try {
-        const response = await ApiUtils.getApiInstanceJson().get<FilmDetails>(`/movie/${filmId}`);
+        const response = await ApiUtils.getApiInstanceJson().get<FilmDetails>(`/movie/${filmId}`, {
+          params: {
+            language: language
+          }
+        });
         setFilmDetails(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération du film :', error);
@@ -43,7 +48,7 @@ export default function AppFilmDetails() {
         if (!authToken) return;
         await ApiUtils.getApiInstanceJson(authToken).post(
           '/addMovie',
-          { id: filmDetails.id, title: filmDetails.title }
+          { id: filmDetails.id, language: language }
         );
         setLoading(false);
       } catch (error) {

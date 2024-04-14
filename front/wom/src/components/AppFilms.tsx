@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import styles from "../css/AppFilms.module.css";
 import { Link } from "react-router-dom";
-import { IconButton, InputBase } from "@mui/material";
+import { Button, IconButton, InputBase } from "@mui/material";
 import { Search } from "@mui/icons-material";
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import ApiUtils from "../utils/ApiUtils";
 
 interface Film {
@@ -15,15 +17,17 @@ export default function AppFilms() {
   const [films, setFilms] = useState<Film[]>([]);
   const [searchValue, setSearchValue] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const filmsPerPage: number = 20;
 
   useEffect(() => {
-    getMovies();
+    getMovies(1);
   }, []);
 
-  async function getMovies() {
+  async function getMovies(moviePage: number) {
     try {
-      const response = await ApiUtils.getApiInstanceJson().get("/movies");
+      const language = localStorage.getItem("language") || "fr";
+      const response = await ApiUtils.getApiInstanceJson().get(
+        `/movies/${moviePage}?language=${language}`
+      );
       setFilms(response.data);
     } catch (error) {
       console.error("Erreur lors de la récupération des films :", error);
@@ -32,33 +36,17 @@ export default function AppFilms() {
 
   function handleSearchEntry(searchEntry: string) {
     setSearchValue(searchEntry);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   }
 
-  //calcule le debut et la fin pour la pagination
-  const startIndex: number = (currentPage - 1) * filmsPerPage;
-  const endIndex: number = startIndex + filmsPerPage;
-
-  // Filtre les films 
-  const filteredFilms = films.filter((film) =>
-    film.title.toLowerCase().includes(searchValue.toLowerCase())
-  );
-
-  const filmsToShow = filteredFilms.slice(startIndex, endIndex);
+  function handleLeftArrowClick(): void {
+    getMovies(currentPage - 1);
+    setCurrentPage(currentPage - 1);
+  }  
   
-  const totalPages: number = Math.ceil(filteredFilms.length / filmsPerPage);
-
-  const paginationSquares = [];
-  for (let i = 1; i <= totalPages; i++) {
-    paginationSquares.push(
-      <button
-        key={i}
-        onClick={() => setCurrentPage(i)}
-        className={currentPage === i ? styles.activePage : styles.pageSquare}
-      >
-        {i}
-      </button>
-    );
+  function handleRightArrowClick(): void {
+    getMovies(currentPage + 1);
+    setCurrentPage(currentPage + 1);
   }
 
   return (
@@ -77,7 +65,7 @@ export default function AppFilms() {
       </div>
 
       <div className={styles.filmsContainer}>
-        {filmsToShow.map((film) => (
+        {films.map((film) => (
           <Link
             to={`/films/${film.id}`}
             key={film.id}
@@ -87,13 +75,23 @@ export default function AppFilms() {
               src={film.image}
               alt={film.title}
               className={styles.filmImage}
-              style={{ width: "100%" }}
             />
             <div className={styles.title}>{film.title}</div>
           </Link>
         ))}
       </div>
-      <div className={styles.pagination}>{paginationSquares}</div>
+      <div className={styles.pagination}>
+        {currentPage !== 1 && (
+        <Button className={styles.pageArrow} onClick={() => handleLeftArrowClick()}>
+          <KeyboardArrowLeftIcon />
+        </Button>)}
+          <span key={currentPage} className={styles.activePage}>
+          {currentPage}
+        </span>
+        <Button className={styles.pageArrow} onClick={() => handleRightArrowClick()}>
+          <KeyboardArrowRightIcon />
+        </Button>
+      </div>
     </div>
   );
 }
