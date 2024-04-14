@@ -1,3 +1,5 @@
+import os
+
 SECRET_KEY = "4b8e08f2c3a4d5e6f7101234567890abcdef1234567890abcdef1234567890ab"
 
 AUTH_PORT = os.getenv('AUTH_PORT', '')
