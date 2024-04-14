@@ -129,7 +129,7 @@ def get_group_recommendation(language: str, groupName: str, onMoviesSeen: bool,
                                                                                   recommended_movie_ids,
                                                                                   recommendations,
                                                                                   most_common_genre_ids)
-        print(recommendations)
+
         sorted_recommendations = sorted(recommendations, key=lambda x: x['popularity'], reverse=True)
         result_reco = []
         genres = get_genres()
@@ -138,7 +138,8 @@ def get_group_recommendation(language: str, groupName: str, onMoviesSeen: bool,
             result_reco.append(transform_to_movie(reco, genre))
         save_log("GET Recommendation {groupName: " + groupName + ", onMoviesSeen: " + str(
             onMoviesSeen) + ", language: " + language + "} : status_code=200", token_payload.get("userId"))
-        return result_reco
+        return result_reco[:10]
+
     elif response.status_code == 404:
         save_log("GET Recommendation {groupName: " + groupName + ", onMoviesSeen: " + str(
             onMoviesSeen) + ", language: " + language + "} : status_code=404", token_payload.get("userId"))
@@ -165,7 +166,6 @@ def recommendation_with_movie(most_seen_movies: list, language: str, movies_seen
                         and any(genre_id in movie['genre_ids'] for genre_id in most_common_genre_ids)):
                     recommendations.append(movie)
                     recommended_movie_ids.add(movie['id'])
-    print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb")
     return recommendations, recommended_movie_ids
 
 
@@ -184,7 +184,6 @@ def recommendation_without_movie(language: str, movies_seen: set, recommended_mo
                 if movie['id'] not in movies_seen and movie['id'] not in recommended_movie_ids:
                     recommendations.append(movie)
                     recommended_movie_ids.add(movie['id'])
-    print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
     return recommendations, recommended_movie_ids
 
 
