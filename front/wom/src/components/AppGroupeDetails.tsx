@@ -29,7 +29,7 @@ export default function AppGroupeDetails() {
             params: {
               language: language,
               groupName: groupName,
-              onMoviesSeen: false
+              onMoviesSeen: true
             }
         });
         console.log(response);

@@ -11,7 +11,9 @@ import ProfileService from '../services/ProfileService';
 export default function AppGroupes() {
   const [searchValue, setSearchValue] = useState('');
   const [newGroupName, setNewGroupName] = useState('');
+  const [isFormValid, setIsFormValid] = useState(false);
   const [groups, setGroups] = useState<string[]>([]);
+  const [groupsToDisplay, setGroupsToDisplay] = useState<string[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const { authToken, userId } = useAuth();
 
@@ -21,9 +23,10 @@ export default function AppGroupes() {
     
   }, []);
   
-  const filteredGroups = groups.filter(group =>
-    group && group.toLowerCase().includes(searchValue.toLowerCase())
-  );    
+  const filteredGroups = groups.filter(group => {
+    const lowercaseGroupName = group.toLowerCase();
+    return lowercaseGroupName.includes(searchValue.toLowerCase()) && !userProfile?.groups.some(userGroup => userGroup.groupName.toLowerCase() === lowercaseGroupName);
+  });
   
   async function fetchGroups() {
     try {
@@ -40,6 +43,7 @@ export default function AppGroupes() {
       await ApiUtils.getApiInstanceJson(authToken).post('/group/create', { groupName: newGroupName });
       setNewGroupName('');
       fetchUserProfile();
+      fetchGroups();
     } catch (error) {
       console.error('Erreur lors de la création du groupe :', error);
     }
@@ -63,6 +67,18 @@ export default function AppGroupes() {
     const userProfile = await ProfileService.fetchUserProfile(userId, authToken);
     setUserProfile(userProfile);
   }
+
+  function handleKeyPress(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key === "Enter" && isFormValid) {
+      handleCreateGroup();
+    }
+  }
+
+  function handleGroupNameInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const { value } = event.target;
+    setNewGroupName(value); 
+    setIsFormValid(value !== "");
+  }
   
   return (
     <div className={styles.container}>
@@ -75,9 +91,10 @@ export default function AppGroupes() {
             variant="outlined"
             fullWidth
             value={newGroupName}
-            onChange={(e) => setNewGroupName(e.target.value)}
+            onChange={handleGroupNameInputChange}
+            onKeyDown={handleKeyPress}
           />
-          <Button onClick={handleCreateGroup} variant="contained" color="primary">Valider</Button>
+          <Button onClick={handleCreateGroup} disabled={!isFormValid} variant="contained" color="primary">Valider</Button>
         </div>
       </Paper>
 
@@ -106,8 +123,7 @@ export default function AppGroupes() {
         {filteredGroups.map((group, index) => (
           <Paper key={index} className={styles.groupContainer}>
             <Typography>{group}</Typography>
-            <Button variant="outlined">Voir</Button>
-            <Button variant="outlined" onClick={() => handleJoinGroup(group)}>Rejoindre</Button>
+            <Button variant="contained" onClick={() => handleJoinGroup(group)}>Rejoindre</Button>
           </Paper>
         ))}
       </Paper>

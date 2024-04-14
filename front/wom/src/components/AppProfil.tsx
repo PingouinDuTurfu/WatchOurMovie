@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Avatar, Button, List, ListItem, ListItemText, Typography, MenuItem, TextField, CircularProgress } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
+import EditIcon from '@mui/icons-material/Edit';
 import styles from "../css/AppProfil.module.css";
 import { useAuth } from '../auth/AuthProvider';
 import { Genre } from '../types/genreType';
@@ -10,6 +11,7 @@ import ProfileService from '../services/ProfileService';
 import ApiUtils from '../utils/ApiUtils';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Language } from '../types/languageType';
+import { Link } from 'react-router-dom';
 
 export default function AppProfil() {
   const [addingGenre, setAddingGenre] = useState(false);
@@ -149,7 +151,7 @@ export default function AppProfil() {
           </div>
           <Typography variant="body1">Prénom : {userProfile.name}</Typography>
           <Typography variant="body1">Nom : {userProfile.lastname}</Typography>
-          <Typography variant="body1">Langue : {userProfile.language}</Typography>
+          <span>Langue : {userProfile.language}
           {editLanguage ? (
             <>
               <TextField
@@ -166,13 +168,13 @@ export default function AppProfil() {
                   </MenuItem>
                 ))}
               </TextField>
-              <Button onClick={handleEditLanguage} variant="contained">Ajouter</Button>
+              <Button onClick={handleEditLanguage} variant="contained">Modifier</Button>
             </>
           ) : (
             <Button onClick={() => setEditLanguage(true)}>
-              <AddIcon />
+              <EditIcon />
             </Button>
-          )}
+          )}</span>
         </div>
       </div>
       <div>
@@ -182,6 +184,7 @@ export default function AppProfil() {
           {userProfile.groups.map((group, index) => (
             <ListItem key={index}>
               <ListItemText primary={group.groupName} />
+              <Button component={Link} to={`/groupes/${group.groupName}`} variant="outlined">Recommandation</Button>
             </ListItem>
           ))}
         </List>
