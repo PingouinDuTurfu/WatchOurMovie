@@ -1,12 +1,11 @@
 SECRET_KEY = "4b8e08f2c3a4d5e6f7101234567890abcdef1234567890abcdef1234567890ab"
 
-MONGO_PORT="27017"
-AUTH_PORT="3000"
-DB_PORT="3001"
-LOG_PORT="3002"
-API_PORT="4269"
+AUTH_PORT = os.getenv('AUTH_PORT', '')
+DB_PORT = os.getenv('DB_MANAGER_PORT', '')
+LOG_PORT = os.getenv('LOG_PORT', '')
+API_PORT = os.getenv('API_PORT', '')
 
-
-AUTH_URL = "http://localhost:" + AUTH_PORT
-DB_URL = "http://localhost:" + DB_PORT
-LOG_URL = "http://localhost:" + LOG_PORT
+SECRET_KEY = os.getenv('JWT_SECRET', '')
+AUTH_URL = "http://auth_provider:" + AUTH_PORT
+DB_URL = "http://db_manager:" + DB_PORT
+LOG_URL = "http://log:" + LOG_PORT
