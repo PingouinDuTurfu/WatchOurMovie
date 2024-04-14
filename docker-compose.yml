@@ -54,3 +54,18 @@ services:
             - db_manager
             - auth_provider
             - log
+        volumes:
+            - ./api:/app/api
+    front:
+        build:
+            context: .
+            dockerfile: ./front/Dockerfile
+        container_name: wom_front
+        ports:
+            - "3003:3003" 
+        env_file:
+            - .env 
+        volumes:
+            - ./front/wom:/front
+        depends_on:
+            - api 

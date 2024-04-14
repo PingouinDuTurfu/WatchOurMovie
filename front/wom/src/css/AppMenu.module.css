@@ -1,0 +1,16 @@
+.navMenu {
+    position: sticky !important;
+    top: 0;
+    width: 100%;
+    overflow: auto;
+    background-color: rgb(65, 150, 190) !important;
+}
+
+.searchBar {
+    border-radius: 8px;
+    background-color: white;
+
+    input {
+        padding: 10px;
+    }
+}

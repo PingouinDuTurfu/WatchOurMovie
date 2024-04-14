@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.paperConnexion {
+    padding: 0em 3em 0em 3em;
+
+    Button,
+    .inputText {
+        margin: 0.5em;
+    }
+}
+
+.connexionContainer,
+.inscriptionContainer {
+  padding: 1em 2em 2em 2em;
+  text-align: center;
+}

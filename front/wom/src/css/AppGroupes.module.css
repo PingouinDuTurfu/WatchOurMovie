@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.paperContainer {
+  width: 45%;
+  padding: 20px;
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+.groupContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.searchContainer {
+  margin-bottom: 20px;
+}
+
+.input {
+  margin: 1em 0 1em 0 !important; 
+}

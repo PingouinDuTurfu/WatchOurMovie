@@ -1,0 +1,23 @@
+.filmContainer {
+  display: flex;
+  padding-bottom: 4em;
+  flex-direction: row;
+}
+
+.filmImage {
+  margin-top: 1em;
+  width: 400px;
+}
+
+.infosColumn {
+  margin: 6em 0em 0em 3em;
+
+  p {
+    margin: 0.25em;
+  }
+
+  .boldText {
+    font-weight: bold;
+    margin-top: 0.5em;
+  }
+}
