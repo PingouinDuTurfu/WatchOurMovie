@@ -12,6 +12,7 @@ import ApiUtils from '../utils/ApiUtils';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Language } from '../types/languageType';
 import { Link } from 'react-router-dom';
+import { Film } from '../types/filmType';
 
 export default function AppProfil() {
   const [addingGenre, setAddingGenre] = useState(false);
@@ -50,8 +51,8 @@ export default function AppProfil() {
   }
 
   function handleLanguageSelect(event: React.ChangeEvent<HTMLInputElement>) {
-    const languageShortName = event.target.value;
-    const selectedLanguage = languages.find(language => language.iso_639_1 === languageShortName);
+    const languageEnglishName = event.target.value;
+    const selectedLanguage = languages.find(language => language.english_name === languageEnglishName);
     if (selectedLanguage) {
       setSelectedLanguage(selectedLanguage);
     }
@@ -133,13 +134,34 @@ export default function AppProfil() {
         await ApiUtils.getApiInstanceJson(authToken).post('/updateGenre', { preferenceGenres: newGenres });
       }
     } catch (error) {
-      throw new Error('Erreur lors de la récupération des genres');
+      throw new Error('Erreur lors de la mise à jour des genres');
     }
   }
 
   async function handleEditLanguage() {
-    // post genres
+    try {
+      if (userProfile?.language && authToken) {
+        await ApiUtils.getApiInstanceJson(authToken).post('/updateLang', { language: selectedLanguage?.iso_639_1 });
+        fetchUserProfile();
+        setEditLanguage(false);
+      }
+    } catch (error) {
+      throw new Error('Erreur lors de la mise à jour de la langue');
+    }
   }
+
+  async function handleClickRemoveToSeen(removedMovie: Film) {
+    try {
+      if (!authToken) return;
+      await ApiUtils.getApiInstanceJson(authToken).post(
+        '/removeMovie',
+        { id: removedMovie.id, language: userProfile?.language }
+      );
+      fetchUserProfile();
+    } catch (error) {
+      console.error('Erreur lors de retirement du film à la liste des films vus :', error);
+    }
+}
 
   return (
     <div className={styles.container}>
@@ -164,7 +186,7 @@ export default function AppProfil() {
               >
                 {languages.map(language => (
                   <MenuItem key={language.iso_639_1} value={language.english_name}>
-                    {language.name}
+                    {language.english_name}
                   </MenuItem>
                 ))}
               </TextField>
@@ -232,6 +254,9 @@ export default function AppProfil() {
         {userProfile?.moviesSeen.map((movie, index) => (
           <ListItem key={index}>
             <ListItemText primary={movie.title} />
+            <Button onClick={() => handleClickRemoveToSeen(movie)}>
+              <DeleteIcon className={styles.deleteIcon}/>
+            </Button>
           </ListItem>
         ))}
       </List>

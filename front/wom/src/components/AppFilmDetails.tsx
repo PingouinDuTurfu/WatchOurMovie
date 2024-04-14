@@ -4,6 +4,8 @@ import ApiUtils from '../utils/ApiUtils';
 import { Button, CircularProgress } from '@mui/material';
 import styles from "../css/AppFilmsDetails.module.css";
 import { useAuth } from '../auth/AuthProvider';
+import { UserProfile } from '../types/profileType';
+import ProfileService from '../services/ProfileService';
 
 interface FilmDetails {
   title: string;
@@ -20,8 +22,10 @@ interface FilmDetails {
 export default function AppFilmDetails() {
   const { filmId } = useParams<{ filmId: string }>();
   const [filmDetails, setFilmDetails] = useState<FilmDetails | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [isMovieSeen, setIsMovieSeen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { authToken } = useAuth();
+  const { authToken, userId } = useAuth();
   const language = localStorage.getItem("language") || "fr";
 
   useEffect(() => {
@@ -41,6 +45,22 @@ export default function AppFilmDetails() {
     fetchFilmDetails();
   }, [filmId]);
 
+  useEffect(() => {
+    fetchUserProfile();
+  }, [userId, authToken]);
+
+  useEffect(() => {
+    if (userProfile && filmDetails) {
+      setIsMovieSeen(userProfile.moviesSeen.some(movie => movie.id === filmDetails.id));
+    }
+  }, [userProfile, filmDetails]);
+  
+  async function fetchUserProfile() {
+    if (userId === null || authToken === null) return;
+    const userProfile = await ProfileService.fetchUserProfile(userId, authToken);
+    setUserProfile(userProfile);
+  }
+
   async function handleClickAddToSeen() {
     if (filmDetails) {
       try {
@@ -51,12 +71,31 @@ export default function AppFilmDetails() {
           { id: filmDetails.id, language: language }
         );
         setLoading(false);
+        setIsMovieSeen(true);
       } catch (error) {
         console.error('Erreur lors de l\'ajout du film à la liste des films vus :', error);
         setLoading(false);
       }
     }
   }
+
+  async function handleClickRemoveToSeen() {
+    if (filmDetails) {
+      try {
+        setLoading(true);
+        if (!authToken) return;
+        await ApiUtils.getApiInstanceJson(authToken).post(
+          '/removeMovie',
+          { id: filmDetails.id, language: language }
+        );
+        setLoading(false);
+        setIsMovieSeen(false);
+      } catch (error) {
+        console.error('Erreur lors de retirement du film à la liste des films vus :', error);
+        setLoading(false);
+      }
+    }
+}
 
   if (!filmDetails) {
     return (
@@ -68,19 +107,22 @@ export default function AppFilmDetails() {
   }
 
   return (
-    <div>
-      <h2>{filmDetails.title}</h2>
-      <img src={filmDetails.image} alt={filmDetails.title} className={styles.filmImage} />
-      <p>{filmDetails.overview}</p>
-      <p>Year: {filmDetails.year}</p>
-      <p>Genres: {filmDetails.genres.join(', ')}</p>
-      <p>Vote Count: {filmDetails.vote_count}</p>
-      <p>Vote Average: {filmDetails.vote_average}</p>
-      <p>Popularity: {filmDetails.popularity}</p>
-      <Button variant='contained' onClick={handleClickAddToSeen} disabled={loading}>
-        {loading ? 'En cours...' : 'Vu'}
-      </Button>
-      <Button variant='contained'>Non vu</Button>
+    <div className={styles.filmContainer}>
+      <div>
+        <h2>{filmDetails.title}</h2>
+        <img src={filmDetails.image} alt={filmDetails.title} className={styles.filmImage} />
+      </div>
+      <div className={styles.infosColumn}>
+        <p>{filmDetails.overview}</p>
+        <p>Année: {filmDetails.year}</p>
+        <p>Genres: {filmDetails.genres.join(', ')}</p>
+        <p>Nombre de votes: {filmDetails.vote_count}</p>
+        <p>Note moyenne: {filmDetails.vote_average}</p>
+        <p>Popularité: {filmDetails.popularity}</p>
+        <Button color={isMovieSeen ? 'secondary' : 'primary'} variant='contained' onClick={isMovieSeen ? handleClickRemoveToSeen : handleClickAddToSeen} disabled={loading}>
+          {loading ? 'En cours...' : isMovieSeen ? 'Supprimer de la liste des vus' : 'Ajouter aux films vus'}
+        </Button>
+      </div>
     </div>
   );
 }

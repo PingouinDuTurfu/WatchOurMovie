@@ -1,28 +1,13 @@
-.container {
-    padding-bottom: 3em;
-}
-
-.filmsContainer {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.title {
-    margin-top: 5px;   
-}
-
 .filmContainer {
-    margin: 10px;
-    width: 250px;
-    text-align: center;
-}
-
-.filmContainer:link,
-.filmContainer:visited {
-    color: inherit;
-    text-decoration: none;
+  display: flex;
+  padding-bottom: 4em;
+  flex-direction: row;
 }
 
 .filmImage {
-    width: 300px;
+  width: 300px;
+}
+
+.infosColumn {
+  margin: 5em 0em 0em 3em;
 }

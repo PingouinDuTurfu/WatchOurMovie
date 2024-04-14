@@ -13,7 +13,6 @@ export default function AppGroupes() {
   const [newGroupName, setNewGroupName] = useState('');
   const [isFormValid, setIsFormValid] = useState(false);
   const [groups, setGroups] = useState<string[]>([]);
-  const [groupsToDisplay, setGroupsToDisplay] = useState<string[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const { authToken, userId } = useAuth();
 
@@ -123,6 +122,7 @@ export default function AppGroupes() {
         {filteredGroups.map((group, index) => (
           <Paper key={index} className={styles.groupContainer}>
             <Typography>{group}</Typography>
+            <Button variant="contained">Voir</Button>
             <Button variant="contained" onClick={() => handleJoinGroup(group)}>Rejoindre</Button>
           </Paper>
         ))}
