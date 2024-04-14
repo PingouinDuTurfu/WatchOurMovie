@@ -6,7 +6,8 @@ Ce projet a pour but de créer une recherche de films en se basant sur la base d
 - **Frontend** : **React** - Permet à l'utilisateur une interface rapide et facile à utiliser.
 - **Database manager** : **Node.js** - Crée une couche d'abstraction pour les appels à TMDB, contient également le cache des requêtes/films stockés dans une base de données locale (MongoDB).
 - **Auth provider** : **Node.js** - Crée des tokens JWT pour sécuriser la connexion.
-- **API** : **Python** - Lie le frontend, le l'auth provider et le db manager entre eux.
+- **Log** : **Node.js** - Garder une trace des logs
+- **API** : **Python** - Lie le frontend, le l'auth provider, le service de log et le db manager entre eux.
 
 # Schéma de l'Infrastructure
 
