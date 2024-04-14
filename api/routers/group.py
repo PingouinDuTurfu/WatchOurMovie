@@ -162,7 +162,6 @@ def recommendation_with_movie(most_seen_movies: list, language: str, movies_seen
     for movie_id, _ in most_seen_movies:
         response = requests.post(DB_URL + "/movie/recommendation/",
                                  json={"movie_id": movie_id, "language": language, "page": 1})
-        print(response.json())
         if response.status_code == 200 or response.status_code == 201:
             data = response.json()
             for movie in data:
