@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import ApiUtils from '../utils/ApiUtils';
-import { Button, CircularProgress } from '@mui/material';
+import { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import ApiUtils from "../utils/ApiUtils";
+import { Button, CircularProgress, Typography } from "@mui/material";
 import styles from "../css/AppFilmsDetails.module.css";
-import { useAuth } from '../auth/AuthProvider';
-import { UserProfile } from '../types/profileType';
-import ProfileService from '../services/ProfileService';
+import { useAuth } from "../auth/AuthProvider";
+import { UserProfile } from "../types/profileType";
+import ProfileService from "../services/ProfileService";
 
 interface FilmDetails {
   title: string;
@@ -31,14 +31,17 @@ export default function AppFilmDetails() {
   useEffect(() => {
     const fetchFilmDetails = async () => {
       try {
-        const response = await ApiUtils.getApiInstanceJson().get<FilmDetails>(`/movie/${filmId}`, {
-          params: {
-            language: language
+        const response = await ApiUtils.getApiInstanceJson().get<FilmDetails>(
+          `/movie/${filmId}`,
+          {
+            params: {
+              language: language,
+            },
           }
-        });
+        );
         setFilmDetails(response.data);
       } catch (error) {
-        console.error('Erreur lors de la récupération du film :', error);
+        console.error("Erreur lors de la récupération du film :", error);
       }
     };
 
@@ -51,13 +54,18 @@ export default function AppFilmDetails() {
 
   useEffect(() => {
     if (userProfile && filmDetails) {
-      setIsMovieSeen(userProfile.moviesSeen.some(movie => movie.id === filmDetails.id));
+      setIsMovieSeen(
+        userProfile.moviesSeen.some((movie) => movie.id === filmDetails.id)
+      );
     }
   }, [userProfile, filmDetails]);
-  
+
   async function fetchUserProfile() {
     if (userId === null || authToken === null) return;
-    const userProfile = await ProfileService.fetchUserProfile(userId, authToken);
+    const userProfile = await ProfileService.fetchUserProfile(
+      userId,
+      authToken
+    );
     setUserProfile(userProfile);
   }
 
@@ -66,14 +74,17 @@ export default function AppFilmDetails() {
       try {
         setLoading(true);
         if (!authToken) return;
-        await ApiUtils.getApiInstanceJson(authToken).post(
-          '/addMovie',
-          { id: filmDetails.id, language: language }
-        );
+        await ApiUtils.getApiInstanceJson(authToken).post("/addMovie", {
+          id: filmDetails.id,
+          language: language,
+        });
         setLoading(false);
         setIsMovieSeen(true);
       } catch (error) {
-        console.error('Erreur lors de l\'ajout du film à la liste des films vus :', error);
+        console.error(
+          "Erreur lors de l'ajout du film à la liste des films vus :",
+          error
+        );
         setLoading(false);
       }
     }
@@ -84,24 +95,38 @@ export default function AppFilmDetails() {
       try {
         setLoading(true);
         if (!authToken) return;
-        await ApiUtils.getApiInstanceJson(authToken).post(
-          '/removeMovie',
-          { id: filmDetails.id, language: language }
-        );
+        await ApiUtils.getApiInstanceJson(authToken).post("/removeMovie", {
+          id: filmDetails.id,
+          language: language,
+        });
         setLoading(false);
         setIsMovieSeen(false);
       } catch (error) {
-        console.error('Erreur lors de retirement du film à la liste des films vus :', error);
+        console.error(
+          "Erreur lors de retirement du film à la liste des films vus :",
+          error
+        );
         setLoading(false);
       }
     }
-}
+  }
 
   if (!filmDetails) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
         <CircularProgress />
-        <div>Nous n'arrivons pas à récupérer les données de ce film, veuillez essayer de vous reconnecter.</div>
+        <div>
+          Nous n'arrivons pas à récupérer les données de ce film, veuillez
+          essayer de vous reconnecter.
+        </div>
       </div>
     );
   }
@@ -109,18 +134,33 @@ export default function AppFilmDetails() {
   return (
     <div className={styles.filmContainer}>
       <div>
-        <h2>{filmDetails.title}</h2>
-        <img src={filmDetails.image} alt={filmDetails.title} className={styles.filmImage} />
+        <Typography variant="h4">{filmDetails.title}</Typography>
+        <img
+          src={filmDetails.image}
+          alt={filmDetails.title}
+          className={styles.filmImage}
+        />
       </div>
       <div className={styles.infosColumn}>
-        <p>{filmDetails.overview}</p>
-        <p>Année: {filmDetails.year}</p>
-        <p>Genres: {filmDetails.genres.join(', ')}</p>
-        <p>Nombre de votes: {filmDetails.vote_count}</p>
-        <p>Note moyenne: {filmDetails.vote_average}</p>
-        <p>Popularité: {filmDetails.popularity}</p>
-        <Button color={isMovieSeen ? 'secondary' : 'primary'} variant='contained' onClick={isMovieSeen ? handleClickRemoveToSeen : handleClickAddToSeen} disabled={loading}>
-          {loading ? 'En cours...' : isMovieSeen ? 'Supprimer de la liste des vus' : 'Ajouter aux films vus'}
+        <Typography variant='body1' className={styles.boldText}>Année </Typography >
+        <Typography variant="body1"> {filmDetails.year}</Typography>
+        <Typography variant='body1' className={styles.boldText}>Genres</Typography >
+        <Typography variant="body1">{filmDetails.genres.join(", ")}</Typography>
+        <Typography variant='body1' className={styles.boldText}>Nombre de votes</Typography >
+        <Typography variant="body1">{filmDetails.vote_count}</Typography>
+        <Typography variant='body1' className={styles.boldText}>Note moyenne</Typography >
+        <Typography variant="body1">{filmDetails.vote_average}</Typography>
+        <Typography variant='body1' className={styles.boldText}>Popularité</Typography >
+        <Typography variant="body1">{filmDetails.popularity}</Typography>
+        <Typography variant='body1' className={styles.boldText}>Synopsis</Typography >
+        <Typography variant="body1">{filmDetails.overview}</Typography>
+        <Button
+          color={isMovieSeen ? "secondary" : "primary"}
+          variant="contained"
+          onClick={isMovieSeen ? handleClickRemoveToSeen : handleClickAddToSeen}
+          disabled={loading}
+        >
+          {loading ? "En cours..." : (isMovieSeen ? "Supprimer de la liste des vus" : "Ajouter aux films vus")}
         </Button>
       </div>
     </div>

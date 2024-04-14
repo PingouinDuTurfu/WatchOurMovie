@@ -1,0 +1,46 @@
+.filmImage {
+  margin-top: 1em;
+  width: 150px;
+}
+
+.filmImage:hover {
+  transform: scale(1.05);
+  transition: transform 0.4s ease;
+}
+
+.infosColumn {
+  margin: 6em 0em 0em 3em;
+
+  p {
+    margin: 0.25em;
+  }
+
+  .boldText {
+    font-weight: bold;
+    margin-top: 0.5em;
+  }
+}
+
+.recommandationContainer {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.filmContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 250px;
+  text-align: center;
+  position: relative;
+}
+
+.filmContainer:link,
+.filmContainer:visited {
+  color: inherit;
+  text-decoration: none;
+}
+
+.smallTitle {
+  margin-top: 10px !important;
+}
