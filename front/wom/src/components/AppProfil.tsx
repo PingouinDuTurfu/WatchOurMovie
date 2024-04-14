@@ -8,6 +8,7 @@ import GenresService from '../services/GenresService';
 import { UserProfile } from '../types/profileType';
 import ProfileService from '../services/ProfileService';
 import ApiUtils from '../utils/ApiUtils';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { Language } from '../types/languageType';
 
 export default function AppProfil() {
@@ -57,6 +58,19 @@ export default function AppProfil() {
   function handleClickWatchedMovies() {
     if (userProfile?.moviesSeen) {
       setShowingMovies(true);
+    }
+  }
+
+  function handleRemoveGenre(removedGenre: string) {
+    if (userProfile !== null) {
+      const updatedGenres = userProfile.preferenceGenres.filter(genre => genre.name !== removedGenre);
+
+      const updatedProfile: UserProfile = {
+        ...userProfile,
+        preferenceGenres: updatedGenres,
+      };
+      setUserProfile(updatedProfile);
+      editGenres(updatedProfile.preferenceGenres);
     }
   }
 
@@ -121,7 +135,7 @@ export default function AppProfil() {
     }
   }
 
-  async function handleEditLanguage(languageShort: string[]) {
+  async function handleEditLanguage() {
     // post genres
   }
 
@@ -155,7 +169,7 @@ export default function AppProfil() {
               <Button onClick={handleEditLanguage} variant="contained">Ajouter</Button>
             </>
           ) : (
-            <Button onClick={() => setAddingGenre(true)}>
+            <Button onClick={() => setEditLanguage(true)}>
               <AddIcon />
             </Button>
           )}
@@ -176,6 +190,9 @@ export default function AppProfil() {
           {userProfile.preferenceGenres.map((genre, index) => (
             <ListItem key={index}>
               <ListItemText primary={genre.name} />
+              <Button onClick={() => handleRemoveGenre(genre.name)}>
+                <DeleteIcon className={styles.deleteIcon}/>
+              </Button>
             </ListItem>
           ))}
           {addingGenre ? (

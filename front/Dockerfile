@@ -1,6 +1,6 @@
 FROM node:latest
 
-WORKDIR /app
+WORKDIR /front
 
 COPY ./front/wom/package*.json ./
 

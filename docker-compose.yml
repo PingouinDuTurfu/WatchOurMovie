@@ -55,7 +55,7 @@ services:
             - auth_provider
             - log
         volumes:
-            - ./api:/app
+            - ./api:/app/api
     front:
         build:
             context: .
@@ -66,6 +66,6 @@ services:
         env_file:
             - .env 
         volumes:
-            - ./front/wom:/app
+            - ./front/wom:/front
         depends_on:
             - api 
