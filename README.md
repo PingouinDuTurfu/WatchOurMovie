@@ -10,14 +10,14 @@ Ce projet a pour but de créer une recherche de films en se basant sur la base d
 
 # Schéma de l'Infrastructure
 
+![image](https://github.com/PingouinDuTurfu/WatchOurMovie/assets/91423302/f6958f68-1e84-4f95-bb60-c3048c23a27d)
+
 # Notre Groupe
 
 - **LANTA Axel**
 - **LEANG Ameilie**
 - **OLLIVIER Rémy**
 - **SALL Marieme**
-- **Configuration**
-- **Fichier .env**
 
 # Configuration
 ### Créez le fichier .env à la racine du répertoire avec le contenu suivant :
