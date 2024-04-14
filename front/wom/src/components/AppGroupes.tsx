@@ -57,7 +57,7 @@ export default function AppGroupes() {
       );
       fetchUserProfile();
     } catch (error) {
-      console.error('Erreur lors de la jointure du groupe :', error);
+      console.error('Erreur pour joindre le groupe :', error);
     }
   };
   
@@ -122,7 +122,7 @@ export default function AppGroupes() {
         {filteredGroups.map((group, index) => (
           <Paper key={index} className={styles.groupContainer}>
             <Typography>{group}</Typography>
-            <Button variant="contained">Voir</Button>
+            <Button component={Link} to={`/groupes/infos/${group}`} variant="contained">Voir</Button>
             <Button variant="contained" onClick={() => handleJoinGroup(group)}>Rejoindre</Button>
           </Paper>
         ))}

@@ -66,7 +66,7 @@ export default function AppGroupeDetails() {
       <Typography variant='h6'>Membres du groupe</Typography>
         {groupInfos?.members.map((member, index) => (
           <div key={index}>
-            {member.username}
+            {member.username} ({member.name} {member.lastname})
           </div>
         ))}
 

@@ -6,7 +6,6 @@ class GroupsService {
   async retrieveGroups(): Promise<string[]> {
     try {
       const response = await ApiUtils.getApiInstanceJson().get('/groups');
-      console.log(response.data);
       return response.data;
       
     } catch (error) {

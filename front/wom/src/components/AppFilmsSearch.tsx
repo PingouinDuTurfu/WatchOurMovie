@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "../css/AppFilms.module.css";
-import { Link, useNavigate } from "react-router-dom";
-import { Button, CircularProgress, IconButton, InputBase, TextField } from "@mui/material";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { Button, CircularProgress, IconButton, InputBase } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import ApiUtils from "../utils/ApiUtils";
+import FilmsService from "../services/FilmsService";
 
 interface Film {
   id: number;
@@ -13,51 +13,43 @@ interface Film {
   image: string;
 }
 
-export default function AppFilms() {
+export default function AppFilmsSearch() {
+  const { searchValue } = useParams<{ searchValue: string }>();
   const [films, setFilms] = useState<Film[]>([]);
-  const [searchValue, setSearchValue] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const navigate = useNavigate();
 
   useEffect(() => {
-    getMovies(1);
+    getSearchMovies(1);
+    console.log(searchValue);
+    
   }, []);
 
-  async function getMovies(moviePage: number) {
-    try {
-      const language = localStorage.getItem("language") || "fr";
-      const response = await ApiUtils.getApiInstanceJson().get(
-        `/movies/${moviePage}?language=${language}`
-      );
-      setFilms(response.data);
-    } catch (error) {
-      console.error("Erreur lors de la récupération des films :", error);
+  async function getSearchMovies(moviePage: number) {
+    if (searchValue) {
+      try {
+        const language = localStorage.getItem("language") || "fr";
+        const response = await FilmsService.searchInMovies(searchValue, moviePage, language);
+        setFilms(response);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des films :", error);
+      }
+    } else {
+      navigate("/films");
     }
-  }
 
-  function handleSearchInput(searchEntry: string) {
-    setSearchValue(searchEntry);
-  }
-
-  function handleSearchClick() {
-    navigate(`/films/recherche/${searchValue}`);
   }
 
   function handleLeftArrowClick(): void {
-    getMovies(currentPage - 1);
+    getSearchMovies(currentPage - 1);
     setCurrentPage(currentPage - 1);
   }  
   
   function handleRightArrowClick(): void {
-    getMovies(currentPage + 1);
+    getSearchMovies(currentPage + 1);
     setCurrentPage(currentPage + 1);
   }
 
-  function handleKeyPress(event: React.KeyboardEvent<HTMLDivElement>) {
-    if (event.key === "Enter") {
-      handleSearchClick();
-    }
-  }
 
   if (!films) {
     return (
@@ -70,20 +62,7 @@ export default function AppFilms() {
 
   return (
     <div className={styles.container}>
-      <h1>Films</h1>
-      <div className={styles.searchBar}>
-        <TextField
-          placeholder="Rechercher…"
-          value={searchValue}
-          onChange={(e) => handleSearchInput(e.target.value)}
-          className={styles.searchInput}
-          onKeyDown={handleKeyPress}
-        />
-        <IconButton type="submit" aria-label="search" onClick={() => handleSearchClick()}>
-          <Search />
-        </IconButton>
-      </div>
-
+      <h1>Films : "{searchValue}"</h1>
       <div className={styles.filmsContainer}>
       {films.length === 0 &&
         <div style={{ display: 'flex', margin: 'auto', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
