@@ -60,8 +60,9 @@ export default function AppFilmDetails() {
 
   if (!filmDetails) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
+        <div>Nous n'arrivons pas à récupérer les données de ce film, veuillez essayer de vous reconnecter.</div>
       </div>
     );
   }

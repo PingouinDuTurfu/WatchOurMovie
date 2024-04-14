@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "../css/AppFilms.module.css";
 import { Link } from "react-router-dom";
-import { Button, IconButton, InputBase } from "@mui/material";
+import { Button, CircularProgress, IconButton, InputBase } from "@mui/material";
 import { Search } from "@mui/icons-material";
 import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -49,6 +49,16 @@ export default function AppFilms() {
     setCurrentPage(currentPage + 1);
   }
 
+
+  if (!films) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+        <div>Nous n'arrivons pas à récupérer les données des films, veuillez essayer de vous reconnecter.</div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <h1>Films</h1>
@@ -65,6 +75,12 @@ export default function AppFilms() {
       </div>
 
       <div className={styles.filmsContainer}>
+      {films.length === 0 &&
+        <div style={{ display: 'flex', margin: 'auto', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+          <CircularProgress />
+          <div>Nous n'arrivons pas à récupérer les données des films, veuillez essayer de vous reconnecter.</div>
+        </div>
+      }
         {films.map((film) => (
           <Link
             to={`/films/${film.id}`}

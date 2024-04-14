@@ -8,13 +8,17 @@ import GenresService from '../services/GenresService';
 import { UserProfile } from '../types/profileType';
 import ProfileService from '../services/ProfileService';
 import ApiUtils from '../utils/ApiUtils';
+import { Language } from '../types/languageType';
 
 export default function AppProfil() {
   const [addingGenre, setAddingGenre] = useState(false);
+  const [editLanguage, setEditLanguage] = useState(false);
   const [showingMovies, setShowingMovies] = useState(false);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [selectedGenre, setSelectedGenre] = useState<Genre | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [languages, setLanguages] = useState<Language[]>([]);
+  const [selectedLanguage, setSelectedLanguage] = useState<Language | null>(null);
   const { authToken, userId } = useAuth();
 
   useEffect(() => {
@@ -29,6 +33,7 @@ export default function AppProfil() {
 
   useEffect(() => {
     fetchGenres();
+    fetchLanguages();
     console.log(authToken);
     console.log(userId);
   }, []);
@@ -38,6 +43,14 @@ export default function AppProfil() {
     const selectedGenre = genres.find(genre => genre.name === genreName);
     if (selectedGenre) {
       setSelectedGenre(selectedGenre);
+    }
+  }
+
+  function handleLanguageSelect(event: React.ChangeEvent<HTMLInputElement>) {
+    const languageShortName = event.target.value;
+    const selectedLanguage = languages.find(language => language.iso_639_1 === languageShortName);
+    if (selectedLanguage) {
+      setSelectedLanguage(selectedLanguage);
     }
   }
 
@@ -77,10 +90,23 @@ export default function AppProfil() {
     }
   }
 
+  async function fetchLanguages(){
+    try {
+      const response = await ApiUtils.getApiInstanceJson().get('/langs');
+      const sortedLanguages = response.data.sort((a: Language, b: Language) => {
+        return a.english_name.localeCompare(b.english_name);
+      });
+      setLanguages(sortedLanguages);
+    } catch (error) {
+      console.log('Erreur lors de la récupération des langues');
+    }
+  }  
+
   if (!userProfile) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
+        <div>Nous n'arrivons pas à récupérer votre profil, veuillez essayer de vous reconnecter.</div>
       </div>
     );
   }
@@ -95,7 +121,7 @@ export default function AppProfil() {
     }
   }
 
-  async function editLanguage(languageShort: string[]) {
+  async function handleEditLanguage(languageShort: string[]) {
     // post genres
   }
 
@@ -110,6 +136,29 @@ export default function AppProfil() {
           <Typography variant="body1">Prénom : {userProfile.name}</Typography>
           <Typography variant="body1">Nom : {userProfile.lastname}</Typography>
           <Typography variant="body1">Langue : {userProfile.language}</Typography>
+          {editLanguage ? (
+            <>
+              <TextField
+                className={styles.languageSelect}
+                id="select-genre"
+                select
+                label="Genre"
+                value={selectedLanguage ? selectedLanguage.english_name : ''}
+                onChange={handleLanguageSelect}
+              >
+                {languages.map(language => (
+                  <MenuItem key={language.iso_639_1} value={language.english_name}>
+                    {language.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <Button onClick={handleEditLanguage} variant="contained">Ajouter</Button>
+            </>
+          ) : (
+            <Button onClick={() => setAddingGenre(true)}>
+              <AddIcon />
+            </Button>
+          )}
         </div>
       </div>
       <div>
@@ -145,7 +194,7 @@ export default function AppProfil() {
                 </MenuItem>
               ))}
             </TextField>
-              <Button onClick={handleAddGenre} variant="contained">Ajouter</Button>
+            <Button onClick={handleAddGenre} variant="contained">Ajouter</Button>
             </>
           ) : (
             <Button onClick={() => setAddingGenre(true)}>
